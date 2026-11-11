@@ -13,9 +13,6 @@ Interface web do **Cidadão Fácil**: o cidadão descreve o que precisa com as p
 | Cidadão beneficiado | Pessoas que procuram emprego, qualificação e serviços públicos, especialmente quem tem pouca familiaridade com portais do governo |
 | Problema, em uma frase | Cidadãos têm dificuldade para encontrar, entender e acessar informações sobre serviços públicos, documentos, direitos e benefícios |
 | Como funciona | Busca em linguagem natural → assistente consulta o catálogo → mostra serviços com justificativa, requisitos, documentos, etapas e fonte oficial |
-| O que cada parte faz | **Front (este repo):** telas do cidadão e painel do catálogo · **API Java:** regras e dados · **Oracle:** persistência · **Python:** análise e algoritmo · **Packet Tracer:** rede |
-| Repositórios | Front: https://github.com/TechVerseFiap/TechVerse.GS-2.FrontEnd · API: _preencher_ |
-| Indicador de impacto | % de buscas que terminam com uma orientação encontrada (tela Painel › Indicadores) |
 | ODS conectados | 4, 8, 10 e 16 |
 
 ## Telas
