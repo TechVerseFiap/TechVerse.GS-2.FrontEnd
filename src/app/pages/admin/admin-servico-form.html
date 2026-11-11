@@ -1,0 +1,181 @@
+<div class="pilha">
+  <nav class="migalhas" style="padding-top: 0" aria-label="Você está em">
+    <ol>
+      <li><a routerLink="/admin/servicos">Serviços</a></li>
+      <li aria-current="page">{{ editando() ? 'Editar' : 'Novo serviço' }}</li>
+    </ol>
+  </nav>
+  <h1>{{ editando() ? 'Editar serviço' : 'Novo serviço' }}</h1>
+
+  @if (mensagem()) {
+    <div class="alerta" [class.alerta-sucesso]="!erroAcao()" [class.alerta-erro]="erroAcao()" role="status" aria-live="polite">
+      <app-icone [nome]="erroAcao() ? 'alerta' : 'check'" />
+      <p class="m-0">{{ mensagem() }}</p>
+    </div>
+  }
+
+  @if (carregando()) {
+    <app-carregando />
+  } @else if (erroCarga()) {
+    <app-erro [mensagem]="erroCarga()" (tentar)="carregarServico()" />
+  } @else {
+    <!-- Dados do serviço -->
+    <form class="cartao pilha" [formGroup]="form" (ngSubmit)="salvar()" novalidate>
+      <div class="grade-form">
+        <div class="campo">
+          <label for="f-nome">Nome do serviço *</label>
+          <input id="f-nome" class="entrada" formControlName="nome" [attr.aria-invalid]="!!erroDe('nome')" aria-describedby="e-nome" />
+          @if (erroDe('nome')) { <span id="e-nome" class="campo-erro">{{ erroDe('nome') }}</span> }
+        </div>
+        <div class="campo">
+          <label for="f-cat">Categoria *</label>
+          <select id="f-cat" class="entrada" formControlName="categoriaId" [attr.aria-invalid]="!!erroDe('categoriaId')" aria-describedby="e-cat">
+            <option [ngValue]="0" disabled>Selecione</option>
+            @for (c of categorias(); track c.id) {
+              <option [ngValue]="c.id">{{ c.nome }}</option>
+            }
+          </select>
+          @if (erroDe('categoriaId')) { <span id="e-cat" class="campo-erro">{{ erroDe('categoriaId') }}</span> }
+        </div>
+      </div>
+
+      <div class="campo">
+        <label for="f-desc">Descrição em linguagem simples *</label>
+        <textarea id="f-desc" class="entrada" rows="3" formControlName="descricao" [attr.aria-invalid]="!!erroDe('descricao')" aria-describedby="h-desc e-desc"></textarea>
+        <span id="h-desc" class="campo-ajuda">Frases curtas, sem termos técnicos. Máximo 500 caracteres.</span>
+        @if (erroDe('descricao')) { <span id="e-desc" class="campo-erro">{{ erroDe('descricao') }}</span> }
+      </div>
+
+      <div class="grade-form">
+        <div class="campo">
+          <label for="f-publico">Para quem é</label>
+          <input id="f-publico" class="entrada" formControlName="publicoAlvo" aria-describedby="e-publico" />
+          @if (erroDe('publicoAlvo')) { <span id="e-publico" class="campo-erro">{{ erroDe('publicoAlvo') }}</span> }
+        </div>
+        <div class="campo">
+          <label for="f-orgao">Órgão responsável *</label>
+          <input id="f-orgao" class="entrada" formControlName="orgaoResponsavel" [attr.aria-invalid]="!!erroDe('orgaoResponsavel')" aria-describedby="e-orgao" />
+          @if (erroDe('orgaoResponsavel')) { <span id="e-orgao" class="campo-erro">{{ erroDe('orgaoResponsavel') }}</span> }
+        </div>
+      </div>
+
+      <div class="grade-form">
+        <div class="campo">
+          <label for="f-url">Link da fonte oficial *</label>
+          <input id="f-url" class="entrada" type="url" formControlName="urlFonte" [attr.aria-invalid]="!!erroDe('urlFonte')" aria-describedby="h-url e-url" />
+          <span id="h-url" class="campo-ajuda">Obrigatório começar com https://</span>
+          @if (erroDe('urlFonte')) { <span id="e-url" class="campo-erro">{{ erroDe('urlFonte') }}</span> }
+        </div>
+        <div class="campo">
+          <label for="f-data">Fonte verificada em *</label>
+          <input id="f-data" class="entrada" type="date" formControlName="dataVerificacao" [max]="hoje" [attr.aria-invalid]="!!erroDe('dataVerificacao')" aria-describedby="e-data" />
+          @if (erroDe('dataVerificacao')) { <span id="e-data" class="campo-erro">{{ erroDe('dataVerificacao') }}</span> }
+        </div>
+      </div>
+
+      <fieldset class="campo">
+        <legend class="rotulo">Canal de atendimento *</legend>
+        <div class="linha">
+          @for (c of canais; track c[0]) {
+            <label class="linha" style="gap: 8px; min-height: 44px; font-weight: 400">
+              <input type="radio" formControlName="canal" [value]="c[0]" style="width: 20px; height: 20px; accent-color: var(--azul)" />
+              {{ c[1] }}
+            </label>
+          }
+        </div>
+      </fieldset>
+
+      <div class="campo">
+        <label for="f-palavras">Palavras-chave do assistente</label>
+        <input id="f-palavras" class="entrada" formControlName="palavrasChave" aria-describedby="h-palavras e-palavras" />
+        <span id="h-palavras" class="campo-ajuda">Separe por vírgula. Use as palavras que o cidadão usaria: “perdi o emprego”, “curso grátis”.</span>
+        @if (erroDe('palavrasChave')) { <span id="e-palavras" class="campo-erro">{{ erroDe('palavrasChave') }}</span> }
+      </div>
+
+      <div class="linha">
+        <button type="submit" class="botao botao-primario" [disabled]="salvando()">
+          {{ salvando() ? 'Salvando...' : editando() ? 'Salvar alterações' : 'Cadastrar serviço' }}
+        </button>
+        <a class="botao botao-secundario" routerLink="/admin/servicos">Voltar</a>
+      </div>
+    </form>
+
+    @if (editando() && servico(); as s) {
+      <!-- Requisitos -->
+      <section class="cartao pilha" aria-labelledby="t-req">
+        <h2 id="t-req">Requisitos</h2>
+        <ul class="itens">
+          @for (r of s.requisitos; track r.id) {
+            <li class="item">
+              <label class="sr-only" [for]="'req-' + r.id">Requisito</label>
+              <input #campoReq class="entrada" [id]="'req-' + r.id" [value]="r.descricao" />
+              <button type="button" class="botao-texto" (click)="salvarRequisito(r.id, campoReq.value)">Salvar</button>
+              <button type="button" class="botao-texto" style="color: var(--vermelho)" (click)="excluirRequisito(r.id)">Excluir</button>
+            </li>
+          } @empty {
+            <li class="texto-suave">Nenhum requisito.</li>
+          }
+        </ul>
+        <div class="item">
+          <label class="sr-only" for="novo-req">Novo requisito</label>
+          <input id="novo-req" class="entrada" placeholder="Novo requisito" [value]="novoRequisito()" (input)="novoRequisito.set($any($event.target).value)" />
+          <button type="button" class="botao botao-secundario botao-pequeno" (click)="adicionarRequisito()">Adicionar</button>
+        </div>
+      </section>
+
+      <!-- Etapas -->
+      <section class="cartao pilha" aria-labelledby="t-etapas">
+        <h2 id="t-etapas">Etapas</h2>
+        <ul class="itens">
+          @for (e of s.etapas; track e.id) {
+            <li class="item">
+              <label class="sr-only" [for]="'ord-' + e.id">Ordem</label>
+              <input #campoOrd class="entrada ordem" type="number" min="1" max="50" [id]="'ord-' + e.id" [value]="e.ordem" />
+              <label class="sr-only" [for]="'eta-' + e.id">Descrição da etapa</label>
+              <input #campoEta class="entrada" [id]="'eta-' + e.id" [value]="e.descricao" />
+              <button type="button" class="botao-texto" (click)="salvarEtapa(e.id, campoOrd.value, campoEta.value)">Salvar</button>
+              <button type="button" class="botao-texto" style="color: var(--vermelho)" (click)="excluirEtapa(e.id)">Excluir</button>
+            </li>
+          } @empty {
+            <li class="texto-suave">Nenhuma etapa.</li>
+          }
+        </ul>
+        <div class="item">
+          <label class="sr-only" for="nova-ord">Ordem da nova etapa</label>
+          <input id="nova-ord" class="entrada ordem" type="number" min="1" max="50" [value]="novaEtapaOrdem()" (input)="novaEtapaOrdem.set(+$any($event.target).value)" />
+          <label class="sr-only" for="nova-eta">Nova etapa</label>
+          <input id="nova-eta" class="entrada" placeholder="Nova etapa" [value]="novaEtapaTexto()" (input)="novaEtapaTexto.set($any($event.target).value)" />
+          <button type="button" class="botao botao-secundario botao-pequeno" (click)="adicionarEtapa()">Adicionar</button>
+        </div>
+      </section>
+
+      <!-- Documentos -->
+      <section class="cartao pilha" aria-labelledby="t-docs">
+        <h2 id="t-docs">Documentos exigidos</h2>
+        <ul class="itens">
+          @for (d of s.documentos; track d.documentoId) {
+            <li class="item linha-entre">
+              <span><strong>{{ d.nome }}</strong>@if (d.observacao) { <span class="texto-suave"> — {{ d.observacao }}</span> }</span>
+              <button type="button" class="botao-texto" style="color: var(--vermelho)" (click)="desvincular(d.documentoId)">Desvincular<span class="sr-only"> {{ d.nome }}</span></button>
+            </li>
+          } @empty {
+            <li class="texto-suave">Nenhum documento vinculado.</li>
+          }
+        </ul>
+        <div class="item">
+          <label class="sr-only" for="novo-doc">Documento</label>
+          <select id="novo-doc" class="entrada" [value]="novoDocumentoId()" (change)="novoDocumentoId.set(+$any($event.target).value)">
+            <option value="0">Escolha um documento</option>
+            @for (d of documentosDisponiveis(); track d.id) {
+              <option [value]="d.id">{{ d.nome }}</option>
+            }
+          </select>
+          <label class="sr-only" for="nova-obs">Observação</label>
+          <input id="nova-obs" class="entrada" placeholder="Observação (opcional)" [value]="novaObservacao()" (input)="novaObservacao.set($any($event.target).value)" />
+          <button type="button" class="botao botao-secundario botao-pequeno" (click)="vincularDocumento()">Vincular</button>
+        </div>
+        <p class="m-0 texto-pequeno texto-suave">Documento novo? Cadastre antes em <a routerLink="/admin/documentos">Documentos</a>.</p>
+      </section>
+    }
+  }
+</div>

@@ -1,0 +1,114 @@
+<div class="container conversa-pagina">
+  <div class="pilha-pequena cabeca">
+    <h1>Assistente</h1>
+    <p class="m-0 texto-suave">Conte o que você precisa. Eu procuro no catálogo e mostro o caminho oficial.</p>
+  </div>
+
+  <!-- Conversa -->
+  <div class="conversa" aria-live="polite" aria-relevant="additions" role="log" aria-label="Conversa com o assistente">
+    @if (conversa().length === 0) {
+      <div class="balao balao-assistente">
+        <p class="m-0">Olá! Você pode escrever, por exemplo: <em>“perdi o emprego”</em>, <em>“quero tirar a identidade”</em> ou <em>“curso gratuito”</em>.</p>
+      </div>
+    }
+
+    @for (t of conversa(); track t.id) {
+      <div class="balao balao-pessoa">
+        <span class="sr-only">Você perguntou:</span>
+        {{ t.pergunta }}
+      </div>
+
+      @if (t.carregando) {
+        <div class="balao balao-assistente digitando" role="status">
+          <span class="sr-only">O assistente está procurando...</span>
+          <span class="ponto" aria-hidden="true"></span><span class="ponto" aria-hidden="true"></span><span class="ponto" aria-hidden="true"></span>
+        </div>
+      } @else if (t.erro) {
+        <div class="alerta alerta-erro" role="alert">
+          <app-icone nome="alerta" />
+          <div class="pilha-pequena">
+            <p class="m-0">{{ t.erro }}</p>
+            <button type="button" class="botao botao-secundario botao-pequeno" (click)="tentarDeNovo(t)">Tentar de novo</button>
+          </div>
+        </div>
+      } @else if (t.resposta; as r) {
+        <div class="balao balao-assistente">
+          <span class="sr-only">O assistente respondeu:</span>
+          <p class="m-0">{{ r.mensagem }}</p>
+        </div>
+
+        <!-- Recomendações -->
+        @if (r.recomendacoes.length) {
+          <ul class="recomendacoes">
+            @for (rec of r.recomendacoes; track rec.servicoId) {
+              <li class="cartao recomendacao">
+                <span class="rotulo-sobre">{{ rec.categoria }} · {{ rec.orgaoResponsavel }}</span>
+                <a class="cartao-titulo" [routerLink]="['/servicos', rec.servicoId]">{{ rec.nome }}</a>
+                <p class="m-0 texto-suave texto-pequeno">
+                  <app-icone nome="info" [tamanho]="16" />
+                  {{ rec.justificativa }}
+                </p>
+                <div class="linha">
+                  <a class="botao botao-primario botao-pequeno" [routerLink]="['/servicos', rec.servicoId]">
+                    Ver passo a passo
+                    <app-icone nome="seta" [tamanho]="18" />
+                  </a>
+                  <button
+                    type="button"
+                    class="botao-texto"
+                    [attr.aria-pressed]="salvos.estaSalvo(rec.servicoId)"
+                    (click)="alternarSalvo(rec.servicoId, rec.nome, rec.categoria)"
+                  >
+                    <app-icone nome="salvar" [tamanho]="18" />
+                    {{ salvos.estaSalvo(rec.servicoId) ? 'Salvo' : 'Salvar para depois' }}
+                  </button>
+                </div>
+              </li>
+            }
+          </ul>
+        }
+
+        <!-- Sugestões quando nada foi encontrado -->
+        @if (r.sugestoesDeCategoria.length) {
+          <div class="pilha-pequena">
+            <p class="m-0 rotulo">Escolha um assunto:</p>
+            <div class="linha">
+              @for (nome of r.sugestoesDeCategoria; track nome) {
+                @if (idDaCategoria(nome); as idCat) {
+                  <a class="botao botao-secundario botao-pequeno" [routerLink]="['/categorias', idCat]">{{ nome }}</a>
+                }
+              }
+            </div>
+          </div>
+        }
+
+        <app-aviso-oficial [texto]="r.aviso" />
+      }
+    }
+  </div>
+
+  <!-- Campo para nova pergunta -->
+  <form class="compositor" (submit)="submeter($event)" novalidate>
+    <label for="nova-pergunta" class="sr-only">Escreva sua pergunta</label>
+    <textarea
+      #campo
+      id="nova-pergunta"
+      class="entrada"
+      rows="2"
+      maxlength="500"
+      placeholder="Escreva sua pergunta"
+      [value]="texto()"
+      (input)="texto.set($any($event.target).value)"
+      (keydown.enter)="$event.preventDefault(); submeter()"
+      [attr.aria-invalid]="erroCampo() ? 'true' : null"
+      [attr.aria-describedby]="erroCampo() ? 'erro-nova' : null"
+    ></textarea>
+    <button type="submit" class="botao botao-primario">
+      <app-icone nome="enviar" [tamanho]="20" />
+      Enviar
+    </button>
+    @if (erroCampo()) {
+      <span id="erro-nova" class="campo-erro" role="alert">{{ erroCampo() }}</span>
+    }
+  </form>
+</div>

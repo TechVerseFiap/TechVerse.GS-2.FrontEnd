@@ -1,0 +1,68 @@
+<div class="container">
+  <nav class="migalhas" aria-label="Você está em">
+    <ol>
+      <li><a routerLink="/">Início</a></li>
+      <li aria-current="page">{{ categoria()?.nome ?? 'Categoria' }}</li>
+    </ol>
+  </nav>
+
+  @if (carregando()) {
+    <app-carregando texto="Buscando serviços..." />
+  } @else if (erro()) {
+    <div class="secao"><app-erro [mensagem]="erro()" (tentar)="carregar()" /></div>
+  } @else if (categoria(); as c) {
+    <div class="secao pilha">
+      <div class="linha">
+        <app-icone [nome]="icone(c.nome)" [tamanho]="36" />
+        <h1>{{ c.nome }}</h1>
+      </div>
+      @if (c.descricao) {
+        <p class="m-0 texto-suave">{{ c.descricao }}</p>
+      }
+
+      <div class="campo" style="max-width: 480px">
+        <label for="filtro">Filtrar nesta categoria</label>
+        <input
+          id="filtro"
+          class="entrada"
+          type="search"
+          placeholder="Ex.: carteira, curso, vaga"
+          [value]="filtro()"
+          (input)="filtro.set($any($event.target).value)"
+        />
+      </div>
+
+      <p class="m-0 texto-suave" role="status">
+        {{ filtrados().length }} {{ filtrados().length === 1 ? 'serviço encontrado' : 'serviços encontrados' }}
+      </p>
+
+      @if (filtrados().length) {
+        <ul class="grade" style="list-style: none; margin: 0; padding: 0">
+          @for (s of filtrados(); track s.id) {
+            <li>
+              <a class="cartao cartao-link" style="height: 100%" [routerLink]="['/servicos', s.id]">
+                <span class="cartao-titulo">{{ s.nome }}</span>
+                <span class="texto-suave texto-pequeno">{{ s.descricao }}</span>
+                <span class="linha" style="margin-top: auto; gap: 8px">
+                  <span class="chip chip-neutro">{{ canal[s.canal] }}</span>
+                  @if (s.precisaReverificacao) {
+                    <span class="chip chip-atencao">Informação em revisão</span>
+                  }
+                </span>
+              </a>
+            </li>
+          }
+        </ul>
+      } @else {
+        <div class="alerta alerta-info">
+          <app-icone nome="info" />
+          <p class="m-0">Nenhum serviço por aqui ainda. Que tal perguntar ao assistente?</p>
+        </div>
+      }
+
+      <div>
+        <a class="botao botao-secundario" routerLink="/assistente">Não achou? Pergunte ao assistente</a>
+      </div>
+    </div>
+  }
+</div>

@@ -1,0 +1,70 @@
+<a class="pular-conteudo" href="#conteudo">Pular para o conteúdo</a>
+
+<!-- Barra de aviso e acessibilidade -->
+<div class="barra-topo">
+  <div class="container barra-topo-interna">
+    <p class="m-0">Projeto acadêmico independente. <strong>Não é um site do governo.</strong></p>
+    <div class="acessibilidade" role="group" aria-label="Opções de acessibilidade">
+      <button type="button" class="botao-acess" (click)="prefs.diminuirFonte()" [disabled]="prefs.nivelFonte() === 0" aria-label="Diminuir tamanho da letra">A-</button>
+      <button type="button" class="botao-acess" (click)="prefs.aumentarFonte()" [disabled]="prefs.nivelFonte() === 2" aria-label="Aumentar tamanho da letra">A+</button>
+      <button type="button" class="botao-acess" (click)="prefs.alternarContraste()" [attr.aria-pressed]="prefs.altoContraste()">
+        <app-icone nome="contraste" [tamanho]="16" />
+        <span>Alto contraste</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Cabeçalho e menu -->
+<header class="cabecalho">
+  <div class="container cabecalho-interno">
+    <a routerLink="/" class="marca" aria-label="Cidadão Fácil, página inicial">
+      <span class="marca-simbolo"><app-icone nome="check" [tamanho]="20" /></span>
+      <span class="marca-texto">Cidadão <strong>Fácil</strong></span>
+    </a>
+    <nav aria-label="Menu principal">
+      <ul class="menu">
+        <li><a routerLink="/" routerLinkActive="ativo" [routerLinkActiveOptions]="{ exact: true }" ariaCurrentWhenActive="page">Início</a></li>
+        <li><a routerLink="/assistente" routerLinkActive="ativo" ariaCurrentWhenActive="page">Assistente</a></li>
+        <li>
+          <a routerLink="/salvos" routerLinkActive="ativo" ariaCurrentWhenActive="page">
+            Salvos
+            @if (salvos.total() > 0) {
+              <span class="contador" [attr.aria-label]="salvos.total() + ' serviços salvos'">{{ salvos.total() }}</span>
+            }
+          </a>
+        </li>
+        <li><a routerLink="/admin" routerLinkActive="ativo" ariaCurrentWhenActive="page">Painel</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+@if (modoDemo) {
+  <div class="faixa-demo" role="note">
+    <div class="container">Modo demonstração: dados de exemplo no navegador, sem conexão com a API.</div>
+  </div>
+}
+
+<!-- Conteúdo da página atual -->
+<main id="conteudo" tabindex="-1">
+  <router-outlet />
+</main>
+
+<!-- Rodapé -->
+<footer class="rodape">
+  <div class="container rodape-interno">
+    <div class="pilha-pequena">
+      <p class="rodape-marca">Cidadão Fácil</p>
+      <p class="m-0">Orientamos e encaminhamos para os canais oficiais. Não concedemos benefícios nem confirmamos direitos.</p>
+    </div>
+    <div class="pilha-pequena">
+      <p class="m-0"><strong>Seus dados</strong></p>
+      <p class="m-0">Não pedimos CPF, documentos ou cadastro. O texto das suas perguntas não é guardado.</p>
+    </div>
+    <div class="pilha-pequena">
+      <p class="m-0"><strong>Global Solution FIAP 2026.2</strong></p>
+      <p class="m-0">CitizenTech · Equipe TechVerse · ODS 4, 8, 10 e 16</p>
+    </div>
+  </div>
+</footer>

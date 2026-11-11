@@ -1,0 +1,124 @@
+<div class="container">
+  @if (carregando()) {
+    <app-carregando texto="Abrindo o serviço..." />
+  } @else if (erro()) {
+    <div class="secao"><app-erro [mensagem]="erro()" (tentar)="carregar()" /></div>
+  } @else if (servico(); as s) {
+    <nav class="migalhas" aria-label="Você está em">
+      <ol>
+        <li><a routerLink="/">Início</a></li>
+        <li><a [routerLink]="['/categorias', s.categoria.id]">{{ s.categoria.nome }}</a></li>
+        <li aria-current="page">{{ s.nome }}</li>
+      </ol>
+    </nav>
+
+    <div class="detalhe secao">
+      <article class="pilha conteudo">
+        <header class="pilha-pequena">
+          <div class="linha" style="gap: 8px">
+            <span class="chip">{{ s.categoria.nome }}</span>
+            <span class="chip chip-neutro">{{ canal[s.canal] }}</span>
+            @if (s.precisaReverificacao) {
+              <span class="chip chip-atencao">Informação em revisão</span>
+            }
+          </div>
+          <h1>{{ s.nome }}</h1>
+          <p class="m-0 descricao">{{ s.descricao }}</p>
+          <p class="m-0 texto-suave">Responsável: <strong>{{ s.orgaoResponsavel }}</strong></p>
+        </header>
+
+        @if (s.publicoAlvo) {
+          <section class="cartao" aria-labelledby="t-publico">
+            <h2 id="t-publico">Para quem é</h2>
+            <p class="m-0">{{ s.publicoAlvo }}</p>
+          </section>
+        }
+
+        <!-- Requisitos -->
+        <section class="cartao" aria-labelledby="t-requisitos">
+          <h2 id="t-requisitos">O que é preciso</h2>
+          @if (s.requisitos.length) {
+            <ul class="lista-marcada">
+              @for (r of s.requisitos; track r.id) {
+                <li>{{ r.descricao }}</li>
+              }
+            </ul>
+          } @else {
+            <p class="m-0 texto-suave">A fonte oficial não lista requisitos específicos.</p>
+          }
+        </section>
+
+        <!-- Checklist de documentos -->
+        <section class="cartao" aria-labelledby="t-docs">
+          <div class="linha-entre">
+            <h2 id="t-docs">Documentos para separar</h2>
+            @if (progresso().total) {
+              <span class="chip" role="status">{{ progresso().feitos }} de {{ progresso().total }} separados</span>
+            }
+          </div>
+          @if (s.documentos.length) {
+            <p class="texto-suave texto-pequeno">Marque o que você já tem em mãos. A lista pode variar conforme o órgão e a sua situação.</p>
+            <ul class="checklist">
+              @for (d of s.documentos; track d.documentoId) {
+                <li>
+                  <input
+                    type="checkbox"
+                    [id]="'doc-' + d.documentoId"
+                    [checked]="separados().has(d.documentoId)"
+                    (change)="marcar(d.documentoId, $any($event.target).checked)"
+                  />
+                  <label [for]="'doc-' + d.documentoId">
+                    <strong>{{ d.nome }}</strong>
+                    @if (d.observacao) {
+                      <span class="obs"> — {{ d.observacao }}</span>
+                    }
+                    @if (d.descricao) {
+                      <span class="texto-suave texto-pequeno bloco">{{ d.descricao }}</span>
+                    }
+                  </label>
+                </li>
+              }
+            </ul>
+          } @else {
+            <p class="m-0 texto-suave">Nenhum documento informado pela fonte.</p>
+          }
+        </section>
+
+        <!-- Passo a passo -->
+        <section class="cartao" aria-labelledby="t-etapas">
+          <h2 id="t-etapas">Passo a passo</h2>
+          <ol class="etapas">
+            @for (e of s.etapas; track e.id) {
+              <li>
+                <span class="etapa-numero" aria-hidden="true">{{ e.ordem }}</span>
+                <span>{{ e.descricao }}</span>
+              </li>
+            }
+          </ol>
+        </section>
+      </article>
+
+      <!-- Próximo passo: link oficial -->
+      <aside class="lateral" aria-label="Próximo passo">
+        <div class="cartao pilha">
+          <h2>Próximo passo</h2>
+          <p class="m-0">Continue no canal oficial para fazer o pedido.</p>
+          <a class="botao botao-primario" [href]="s.urlFonte" target="_blank" rel="noopener noreferrer">
+            Ir para o site oficial
+            <app-icone nome="externo" [tamanho]="18" />
+            <span class="sr-only">(abre em nova aba)</span>
+          </a>
+          <p class="m-0 texto-pequeno texto-suave fonte">
+            <app-icone nome="check" [tamanho]="16" />
+            Fonte: {{ dominio(s.urlFonte) }} · verificado em {{ s.dataVerificacao | date: 'dd/MM/yyyy' }}
+          </p>
+          <button type="button" class="botao botao-secundario" [attr.aria-pressed]="salvos.estaSalvo(s.id)" (click)="alternarSalvo(s)">
+            <app-icone nome="salvar" [tamanho]="18" />
+            {{ salvos.estaSalvo(s.id) ? 'Salvo neste aparelho' : 'Salvar para depois' }}
+          </button>
+        </div>
+        <app-aviso-oficial [texto]="s.aviso" />
+      </aside>
+    </div>
+  }
+</div>

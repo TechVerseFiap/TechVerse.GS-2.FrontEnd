@@ -1,0 +1,112 @@
+<!-- Pergunta principal -->
+<section class="hero" aria-labelledby="titulo-hero">
+  <div class="container hero-interno">
+    <div class="pilha hero-texto">
+      <h1 id="titulo-hero">Do que você precisa hoje?</h1>
+      <p class="hero-sub">Escreva do seu jeito. A gente mostra o caminho, os documentos e o site oficial para continuar.</p>
+    </div>
+
+    <form class="caixa-pergunta" (submit)="perguntar($event)" novalidate>
+      <label for="pergunta" class="rotulo">Conte sua necessidade</label>
+      <textarea
+        id="pergunta"
+        class="entrada"
+        rows="3"
+        maxlength="500"
+        placeholder="Ex.: Estou desempregado e quero um curso gratuito"
+        [value]="pergunta()"
+        (input)="pergunta.set($any($event.target).value)"
+        (keydown.enter)="$event.preventDefault(); perguntar()"
+        [attr.aria-invalid]="erroPergunta() ? 'true' : null"
+        aria-describedby="pergunta-ajuda pergunta-erro"
+      ></textarea>
+      <span id="pergunta-ajuda" class="campo-ajuda">Não precisa informar CPF nem dados pessoais.</span>
+      @if (erroPergunta()) {
+        <span id="pergunta-erro" class="campo-erro" role="alert">{{ erroPergunta() }}</span>
+      }
+      <button type="submit" class="botao botao-primario">
+        <app-icone nome="busca" [tamanho]="20" />
+        Perguntar ao assistente
+      </button>
+    </form>
+
+    <div class="exemplos">
+      <p class="m-0 texto-pequeno">Ou toque em um exemplo:</p>
+      <div class="linha">
+        @for (ex of exemplos; track ex) {
+          <button type="button" class="exemplo" (click)="usarExemplo(ex)">{{ ex }}</button>
+        }
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Categorias -->
+<section class="secao" aria-labelledby="titulo-categorias">
+  <div class="container pilha">
+    <h2 id="titulo-categorias">Escolha um assunto</h2>
+    @if (carregando()) {
+      <app-carregando texto="Buscando os assuntos..." />
+    } @else if (erro()) {
+      <app-erro [mensagem]="erro()" (tentar)="carregar()" />
+    } @else {
+      <ul class="lista-categorias">
+        @for (c of categorias(); track c.id) {
+          <li>
+            <a class="cartao cartao-link categoria" [routerLink]="['/categorias', c.id]">
+              <span class="categoria-icone"><app-icone [nome]="icone(c.nome)" [tamanho]="28" /></span>
+              <span class="cartao-titulo">{{ c.nome }}</span>
+              @if (c.descricao) {
+                <span class="texto-suave texto-pequeno">{{ c.descricao }}</span>
+              }
+            </a>
+          </li>
+        }
+      </ul>
+    }
+  </div>
+</section>
+
+<!-- Serviços em destaque -->
+@if (!carregando() && !erro() && destaques().length) {
+  <section class="secao fundo-branco" aria-labelledby="titulo-destaques">
+    <div class="container pilha">
+      <h2 id="titulo-destaques">Serviços em destaque</h2>
+      <ul class="grade lista-limpa">
+        @for (s of destaques(); track s.id) {
+          <li>
+            <a class="cartao cartao-link" [routerLink]="['/servicos', s.id]">
+              <span class="rotulo-sobre">{{ s.categoria }}</span>
+              <span class="cartao-titulo">{{ s.nome }}</span>
+              <span class="texto-suave texto-pequeno">{{ s.descricao }}</span>
+            </a>
+          </li>
+        }
+      </ul>
+    </div>
+  </section>
+}
+
+<!-- Como funciona -->
+<section class="secao" aria-labelledby="titulo-como">
+  <div class="container pilha">
+    <h2 id="titulo-como">Como funciona</h2>
+    <ol class="passos">
+      <li class="cartao">
+        <span class="passo-numero" aria-hidden="true">1</span>
+        <h3>Você conta o que precisa</h3>
+        <p class="m-0 texto-suave">Com suas palavras, sem termos difíceis e sem cadastro.</p>
+      </li>
+      <li class="cartao">
+        <span class="passo-numero" aria-hidden="true">2</span>
+        <h3>Mostramos os caminhos</h3>
+        <p class="m-0 texto-suave">Serviços que podem ajudar, com requisitos, documentos e etapas.</p>
+      </li>
+      <li class="cartao">
+        <span class="passo-numero" aria-hidden="true">3</span>
+        <h3>Você segue no canal oficial</h3>
+        <p class="m-0 texto-suave">Cada orientação traz o link oficial e a data em que foi conferida.</p>
+      </li>
+    </ol>
+  </div>
+</section>
