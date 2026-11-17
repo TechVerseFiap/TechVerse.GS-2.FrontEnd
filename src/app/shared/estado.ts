@@ -1,13 +1,34 @@
 // Componentes de estado reutilizáveis: carregando, erro e aviso oficial
-import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnDestroy, input, output, signal } from '@angular/core';
 import { Icone } from './icone';
+
+// Aviso que aparece só quando a espera passa de 6 segundos (servidor gratuito acordando)
+@Component({
+  selector: 'app-dica-lenta',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  template: `@if (visivel()) {
+    <span class="texto-pequeno texto-suave">O servidor pode estar iniciando. Na primeira vez isso pode levar até 1 minuto.</span>
+  }`,
+})
+export class DicaLenta implements OnDestroy {
+  protected readonly visivel = signal(false);
+  private readonly timer = setTimeout(() => this.visivel.set(true), 6000);
+
+  ngOnDestroy(): void {
+    clearTimeout(this.timer);
+  }
+}
 
 @Component({
   selector: 'app-carregando',
+  imports: [DicaLenta],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `<div class="estado" role="status" aria-live="polite">
     <span class="spinner" aria-hidden="true"></span>
-    <span>{{ texto() }}</span>
+    <span class="pilha-pequena">
+      <span>{{ texto() }}</span>
+      <app-dica-lenta />
+    </span>
   </div>`,
 })
 export class Carregando {

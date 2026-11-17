@@ -1,6 +1,7 @@
 // Página inicial: pergunta livre, categorias e serviços em destaque
 import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
+import { forkJoin } from 'rxjs';
 import { Api, mensagemDeErro } from '../../core/api';
 import { Categoria, ServicoResumo } from '../../core/models';
 import { Carregando, Erro } from '../../shared/estado';
@@ -40,16 +41,12 @@ export class Inicio implements OnInit {
   protected carregar(): void {
     this.carregando.set(true);
     this.erro.set('');
-    this.api.listarCategorias().subscribe({
-      next: (cats) => {
+    // As duas chamadas saem ao mesmo tempo (forkJoin), sem uma esperar a outra
+    forkJoin({ cats: this.api.listarCategorias(), servs: this.api.listarServicos() }).subscribe({
+      next: ({ cats, servs }) => {
         this.categorias.set(cats);
-        this.api.listarServicos().subscribe({
-          next: (servs) => {
-            this.destaques.set(servs.slice(0, 3));
-            this.carregando.set(false);
-          },
-          error: (e) => this.falhar(e),
-        });
+        this.destaques.set(servs.slice(0, 3));
+        this.carregando.set(false);
       },
       error: (e) => this.falhar(e),
     });

@@ -4,18 +4,25 @@
 
 Interface web do **Cidadão Fácil**: o cidadão descreve o que precisa com as próprias palavras e recebe serviços públicos relacionados, com requisitos, documentos, passo a passo e link para o canal oficial.
 
+## Links
+
+| | Link |
+|---|---|
+| **Site publicado (front-end)** | https://techverse-gs-2-frontend.onrender.com |
+| **API publicada (Java / Spring Boot)** | https://cidadao-facil-api.onrender.com |
+| **Swagger da API** | https://cidadao-facil-api.onrender.com/swagger-ui.html |
+| **Repositório da API** | https://github.com/TechVerseFiap/TechVerse.GS-2.BackEnd |
+
+> Hospedagem no plano gratuito do Render: se a API estiver parada, a primeira busca pode levar cerca de 1 minuto. Para "acordar" antes de usar, abra https://cidadao-facil-api.onrender.com/api/status e espere aparecer `"status":"online"`.
+
 ## Ficha da CitizenTech
 
 | Campo | Definição |
 |---|---|
 | Nome | Cidadão Fácil |
-| Cidade e bairro | _preencher_ |
 | Cidadão beneficiado | Pessoas que procuram emprego, qualificação e serviços públicos, especialmente quem tem pouca familiaridade com portais do governo |
 | Problema, em uma frase | Cidadãos têm dificuldade para encontrar, entender e acessar informações sobre serviços públicos, documentos, direitos e benefícios |
 | Como funciona | Busca em linguagem natural → assistente consulta o catálogo → mostra serviços com justificativa, requisitos, documentos, etapas e fonte oficial |
-| O que cada parte faz | **Front (este repo):** telas do cidadão e painel do catálogo · **API Java:** regras e dados · **Oracle:** persistência · **Python:** análise e algoritmo · **Packet Tracer:** rede |
-| Repositórios | Front: https://github.com/TechVerseFiap/TechVerse.GS-2.FrontEnd · API: _preencher_ |
-| Indicador de impacto | % de buscas que terminam com uma orientação encontrada (tela Painel › Indicadores) |
 | ODS conectados | 4, 8, 10 e 16 |
 
 ## Telas
@@ -61,34 +68,50 @@ Angular 22 · componentes standalone · signals · controle de fluxo `@if/@for` 
 
 ## Como executar
 
+### Online (sem instalar nada)
+Acesse https://techverse-gs-2-frontend.onrender.com. O site já está ligado à API publicada no Render, com os dados no Oracle da FIAP.
+
+Roteiro sugerido:
+1. Na tela inicial, escreva *“estou desempregado e quero um curso gratuito”*.
+2. Abra um dos serviços recomendados e marque os documentos no checklist.
+3. Em **Painel**, veja a lista de serviços, edite um e confira os **Indicadores**.
+4. Teste **A+ / A-** e **Alto contraste** na barra do topo.
+
+### Localmente
 Requisitos: **Node.js 22+** e npm.
 
 ```bash
 npm install
-npm start            # http://localhost:4200 — modo demonstração (sem API)
 ```
 
-### Conectar na API Java
-1. Rode a API (`cidadao-facil-api`) em `http://localhost:8080`.
-2. Em `src/environments/environment.development.ts`, troque `useMock` para `false`.
-3. `npm start`.
+| Comando | Resultado |
+|---|---|
+| `npm start` | `http://localhost:4200` em **modo demonstração**: dados de exemplo no navegador, sem a API |
+| `npx ng serve --configuration production` | `http://localhost:4200` ligado à **API publicada no Render** |
 
-### Build de produção
-```bash
-npm run build                                   # usa a API em environment.ts (apiUrl)
-npx ng build --configuration demo               # site que funciona sozinho (modo demonstração)
-```
-Saída em `dist/cidadao-facil-web/browser`.
+Para usar a API rodando no seu computador (`http://localhost:8080`), troque `useMock` para `false` em `src/environments/environment.development.ts` e rode `npm start`.
 
-> Antes do deploy, coloque o link real da API (Render) em `src/environments/environment.ts`.
+### Ambientes
+
+| Arquivo | Usado em | API |
+|---|---|---|
+| `environment.development.ts` | `npm start` | modo demonstração (ou `localhost:8080` com `useMock: false`) |
+| `environment.ts` | `npm run build` (produção) | `https://cidadao-facil-api.onrender.com/api` |
+| `environment.demo.ts` | `npx ng build --configuration demo` | modo demonstração, sem API |
+
+O build gera os arquivos em `dist/cidadao-facil-web/browser`.
 
 ### Deploy no Render (Static Site)
-1. **New > Static Site** › conecte este repositório.
-2. Build command: `npm ci && npm run build`
-3. Publish directory: `dist/cidadao-facil-web/browser`
-4. Em **Redirects/Rewrites**: `/*` → `/index.html` (Rewrite), para as rotas do Angular funcionarem ao recarregar a página.
+O site está publicado em https://techverse-gs-2-frontend.onrender.com com esta configuração:
 
-Ou use o `render.yaml` da raiz (New > Blueprint).
+| Campo | Valor |
+|---|---|
+| Tipo | Static Site |
+| Build Command | `npm ci && npm run build` |
+| Publish Directory | `dist/cidadao-facil-web/browser` |
+| Redirects/Rewrites | `/*` → `/index.html` (Rewrite), para as rotas do Angular funcionarem ao recarregar a página |
+
+Cada commit na branch `main` gera um novo deploy automaticamente. A mesma configuração está no `render.yaml` da raiz (New › Blueprint).
 
 ## Integrantes
 

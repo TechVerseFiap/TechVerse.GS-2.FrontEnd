@@ -1,6 +1,7 @@
 // Serviços de uma categoria, com filtro local
 import { ChangeDetectionStrategy, Component, computed, effect, inject, input, signal, untracked } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { forkJoin } from 'rxjs';
 import { Api, mensagemDeErro } from '../../core/api';
 import { CANAL_ROTULO, Categoria, ServicoResumo } from '../../core/models';
 import { Carregando, Erro } from '../../shared/estado';
@@ -42,16 +43,12 @@ export class CategoriaPagina {
   protected carregar(id = Number(this.id())): void {
     this.carregando.set(true);
     this.erro.set('');
-    this.api.buscarCategoria(id).subscribe({
-      next: (c) => {
+    // Categoria e serviços carregados em paralelo
+    forkJoin({ c: this.api.buscarCategoria(id), s: this.api.listarServicos({ categoria: id }) }).subscribe({
+      next: ({ c, s }) => {
         this.categoria.set(c);
-        this.api.listarServicos({ categoria: id }).subscribe({
-          next: (s) => {
-            this.servicos.set(s);
-            this.carregando.set(false);
-          },
-          error: (e) => this.falhar(e),
-        });
+        this.servicos.set(s);
+        this.carregando.set(false);
       },
       error: (e) => this.falhar(e),
     });

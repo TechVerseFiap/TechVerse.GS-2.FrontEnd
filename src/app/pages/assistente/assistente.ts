@@ -15,7 +15,7 @@ import { RouterLink } from '@angular/router';
 import { Api, mensagemDeErro } from '../../core/api';
 import { Categoria, RespostaAssistente } from '../../core/models';
 import { Salvos } from '../../core/salvos';
-import { AvisoOficial } from '../../shared/estado';
+import { AvisoOficial, DicaLenta } from '../../shared/estado';
 import { Icone } from '../../shared/icone';
 
 interface Troca {
@@ -28,7 +28,7 @@ interface Troca {
 
 @Component({
   selector: 'app-assistente',
-  imports: [RouterLink, Icone, AvisoOficial],
+  imports: [RouterLink, Icone, AvisoOficial, DicaLenta],
   templateUrl: './assistente.html',
   styleUrl: './assistente.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
