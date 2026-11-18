@@ -214,3 +214,22 @@ textarea.entrada { resize: vertical; }
 .migalhas { font-size: 0.9375rem; padding-top: 20px; }
 .migalhas ol { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; }
 .migalhas li + li::before { content: '›'; margin-right: 6px; color: var(--texto-suave); }
+
+/* Tabelas do painel viram cartões no celular */
+@media (max-width: 720px) {
+  .tabela-caixa:has(.tabela-responsiva) { border: 0; background: transparent; overflow: visible; }
+  .tabela-responsiva { min-width: 0; }
+  .tabela-responsiva thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); }
+  .tabela-responsiva, .tabela-responsiva tbody, .tabela-responsiva tr, .tabela-responsiva td { display: block; }
+  .tabela-responsiva tr {
+    margin-bottom: 12px; padding: 14px 16px; border: 1px solid var(--borda);
+    border-radius: var(--raio); background: var(--superficie); box-shadow: var(--sombra);
+  }
+  .tabela-responsiva td { border: 0; padding: 3px 0; }
+  .tabela-responsiva td:first-child { font-size: 1.0625rem; padding-bottom: 6px; }
+  .tabela-responsiva td[data-label]:not(:first-child)::before {
+    content: attr(data-label) ': '; font-weight: 700; color: var(--texto-suave);
+  }
+  .tabela-responsiva .celula-acoes { margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--borda); }
+  .tabela-responsiva .celula-acoes .linha { flex-wrap: wrap !important; }
+}

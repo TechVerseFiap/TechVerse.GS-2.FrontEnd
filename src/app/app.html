@@ -3,8 +3,8 @@
 <!-- Barra de aviso e acessibilidade -->
 <div class="barra-topo">
   <div class="container barra-topo-interna">
-    <p class="m-0">Projeto acadêmico independente. <strong>Não é um site do governo.</strong></p>
-    <div class="acessibilidade" role="group" aria-label="Opções de acessibilidade">
+    <p class="m-0 aviso-topo"><span class="so-desktop">Projeto acadêmico independente.&nbsp;</span><span class="so-celular">Projeto acadêmico.&nbsp;</span><strong>Não é um site do governo.</strong></p>
+    <div id="opcoes-acess" class="acessibilidade" [class.aberta]="acessAberto()" role="group" aria-label="Opções de acessibilidade">
       <button type="button" class="botao-acess" (click)="prefs.diminuirFonte()" [disabled]="prefs.nivelFonte() === 0" aria-label="Diminuir tamanho da letra">A-</button>
       <button type="button" class="botao-acess" (click)="prefs.aumentarFonte()" [disabled]="prefs.nivelFonte() === 2" aria-label="Aumentar tamanho da letra">A+</button>
       <button type="button" class="botao-acess" (click)="prefs.alternarContraste()" [attr.aria-pressed]="prefs.altoContraste()">
@@ -22,7 +22,9 @@
       <span class="marca-simbolo"><app-icone nome="check" [tamanho]="20" /></span>
       <span class="marca-texto">Cidadão <strong>Fácil</strong></span>
     </a>
-    <nav aria-label="Menu principal">
+    <button type="button" class="botao-aa so-celular" (click)="acessAberto.set(!acessAberto())"
+      [attr.aria-expanded]="acessAberto()" aria-controls="opcoes-acess" aria-label="Opções de acessibilidade">Aa</button>
+    <nav class="menu-principal" aria-label="Menu principal">
       <ul class="menu">
         <li><a routerLink="/" routerLinkActive="ativo" [routerLinkActiveOptions]="{ exact: true }" ariaCurrentWhenActive="page">Início</a></li>
         <li><a routerLink="/assistente" routerLinkActive="ativo" ariaCurrentWhenActive="page">Assistente</a></li>
@@ -50,6 +52,28 @@
 <main id="conteudo" tabindex="-1">
   <router-outlet />
 </main>
+
+<!-- Navegação inferior (só no celular) -->
+<nav class="nav-inferior" aria-label="Menu principal">
+  <a routerLink="/" routerLinkActive="ativo" [routerLinkActiveOptions]="{ exact: true }" ariaCurrentWhenActive="page">
+    <app-icone nome="casa" [tamanho]="22" /><span>Início</span>
+  </a>
+  <a routerLink="/assistente" routerLinkActive="ativo" ariaCurrentWhenActive="page">
+    <app-icone nome="conversa" [tamanho]="22" /><span>Assistente</span>
+  </a>
+  <a routerLink="/salvos" routerLinkActive="ativo" ariaCurrentWhenActive="page">
+    <span class="icone-com-contador">
+      <app-icone nome="salvar" [tamanho]="22" />
+      @if (salvos.total() > 0) {
+        <span class="contador contador-mini" aria-hidden="true">{{ salvos.total() }}</span>
+      }
+    </span>
+    <span>Salvos<span class="sr-only">@if (salvos.total() > 0) {, {{ salvos.total() }} itens}</span></span>
+  </a>
+  <a routerLink="/admin" routerLinkActive="ativo" ariaCurrentWhenActive="page">
+    <app-icone nome="painel" [tamanho]="22" /><span>Painel</span>
+  </a>
+</nav>
 
 <!-- Rodapé -->
 <footer class="rodape">

@@ -1,5 +1,6 @@
 // Rotas da aplicação, carregadas sob demanda
 import { Routes } from '@angular/router';
+import { exigeLogin } from './core/autenticacao';
 
 export const routes: Routes = [
   {
@@ -28,7 +29,13 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/salvos/salvos').then((m) => m.SalvosPagina),
   },
   {
+    path: 'login',
+    title: 'Entrar no painel — Cidadão Fácil',
+    loadComponent: () => import('./pages/login/login').then((m) => m.Login),
+  },
+  {
     path: 'admin',
+    canActivate: [exigeLogin],
     loadComponent: () => import('./pages/admin/admin-layout').then((m) => m.AdminLayout),
     children: [
       { path: '', pathMatch: 'full', redirectTo: 'servicos' },

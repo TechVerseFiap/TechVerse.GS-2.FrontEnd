@@ -61,3 +61,7 @@
 }
 .compositor textarea { flex: 1 1 260px; }
 .compositor .campo-erro { flex-basis: 100%; }
+/* No celular o campo fica logo acima da barra de navegação inferior */
+@media (max-width: 720px) {
+  .compositor { bottom: calc(64px + env(safe-area-inset-bottom)); padding: 10px 0 12px; }
+}

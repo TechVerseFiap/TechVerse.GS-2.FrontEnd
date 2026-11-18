@@ -46,15 +46,15 @@ import { Icone } from '../../shared/icone';
         <app-erro [mensagem]="erro()" (tentar)="carregar()" />
       } @else {
         <div class="tabela-caixa">
-          <table class="tabela">
+          <table class="tabela tabela-responsiva">
             <caption class="sr-only">Categorias cadastradas</caption>
             <thead><tr><th scope="col">Nome</th><th scope="col">Descrição</th><th scope="col"><span class="sr-only">Ações</span></th></tr></thead>
             <tbody>
               @for (c of itens(); track c.id) {
                 <tr>
-                  <td><strong>{{ c.nome }}</strong></td>
-                  <td>{{ c.descricao }}</td>
-                  <td>
+                  <td data-label="Nome"><strong>{{ c.nome }}</strong></td>
+                  <td data-label="Descrição">{{ c.descricao }}</td>
+                  <td class="celula-acoes">
                     <div class="linha" style="gap: 4px; flex-wrap: nowrap">
                       <button type="button" class="botao-texto" (click)="editar(c)">Editar<span class="sr-only"> {{ c.nome }}</span></button>
                       @if (confirmando() === c.id) {

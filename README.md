@@ -8,12 +8,12 @@ Interface web do **Cidadão Fácil**: o cidadão descreve o que precisa com as p
 
 | | Link |
 |---|---|
-| **Site publicado (front-end)** | https://techverse-gs-2-frontend.onrender.com |
+| **Site publicado (front-end, Vercel)** | https://VERCEL_URL |
 | **API publicada (Java / Spring Boot)** | https://cidadao-facil-api.onrender.com |
 | **Swagger da API** | https://cidadao-facil-api.onrender.com/swagger-ui.html |
 | **Repositório da API** | https://github.com/TechVerseFiap/TechVerse.GS-2.BackEnd |
 
-> Hospedagem no plano gratuito do Render: se a API estiver parada, a primeira busca pode levar cerca de 1 minuto. Para "acordar" antes de usar, abra https://cidadao-facil-api.onrender.com/api/status e espere aparecer `"status":"online"`.
+> O front fica no **Vercel** e a API no **Render**. No plano gratuito do Render, se a API estiver parada, a primeira busca pode levar cerca de 1 minuto. Para "acordar" antes de usar, abra https://cidadao-facil-api.onrender.com/api/status e espere aparecer `"status":"online"`.
 
 ## Ficha da CitizenTech
 
@@ -34,6 +34,7 @@ Interface web do **Cidadão Fácil**: o cidadão descreve o que precisa com as p
 | `/categorias/:id` | Serviços de uma categoria, com filtro | `GET /api/categorias/{id}`, `GET /api/servicos?categoria=` |
 | `/servicos/:id` | Detalhe: requisitos, checklist de documentos, etapas, fonte | `GET /api/servicos/{id}` |
 | `/salvos` | Serviços salvos neste aparelho | (local, sem servidor) |
+| `/login` | Entrada no painel da equipe (login simulado) | (local, sem servidor) |
 | `/admin/servicos` | Lista e exclusão de serviços | `GET`, `DELETE /api/servicos` |
 | `/admin/servicos/novo` e `/:id` | Cadastro/edição + requisitos, etapas e documentos | `POST`, `PUT /api/servicos`, `/requisitos`, `/etapas`, `/documentos` |
 | `/admin/categorias` | CRUD de categorias | `GET`, `POST`, `PUT`, `DELETE /api/categorias` |
@@ -46,9 +47,28 @@ Interface web do **Cidadão Fácil**: o cidadão descreve o que precisa com as p
 - **Transparência**: toda orientação mostra a fonte oficial e a data de verificação; dados antigos aparecem como “Informação em revisão”.
 - **Honestidade**: quando não encontra nada, o assistente diz isso e oferece saídas (reescrever ou escolher um assunto).
 - **Acessibilidade**: fonte *Atkinson Hyperlegible* (criada para baixa visão), contraste ≥ 4.5:1, modo **alto contraste**, **A+ / A-**, link “Pular para o conteúdo”, foco visível, alvos de toque ≥ 44 px, rótulos em todos os campos, mensagens de erro ligadas aos campos (`aria-describedby`), respostas do assistente anunciadas a leitores de tela (`aria-live`), respeito a “reduzir movimento”.
-- **Mobile first**: todas as telas funcionam em 360 px.
-- **Privacidade**: sem login, sem CPF, sem documentos. “Salvos” fica só no navegador.
+- **Mobile first**: todas as telas funcionam em 360 px. No celular, o topo fica compacto (aviso em uma linha e opções de acessibilidade no botão **Aa**), a navegação vai para uma barra fixa embaixo, como em aplicativos, e as tabelas do painel viram cartões.
+- **Privacidade**: o cidadão não faz login nem informa CPF ou documentos. “Salvos” fica só no navegador. Só o painel da equipe pede login.
 - **Identidade**: paleta inspirada no padrão visual de serviços públicos digitais (azul institucional + amarelo), **sem usar marcas oficiais** e com aviso fixo de que não é um site do governo.
+
+## Acesso ao painel (login simulado)
+
+O **Painel** (`/admin`) é a área da equipe que mantém o catálogo. Para entrar, use o RM de um integrante e a senha de demonstração:
+
+| Integrante | Usuário (RM) | Senha |
+|---|---|---|
+| Davi Marques de Andrade Munhoz | `566223` | `techverse2026` |
+| Diogo Oliveira Lima | `562559` | `techverse2026` |
+| Leandro Simoneli da Silva | `566539` | `techverse2026` |
+| Lucas dos Reis Aquino | `562414` | `techverse2026` |
+| Lucas Perez Bonato | `565356` | `techverse2026` |
+
+Como funciona:
+- Qualquer rota `/admin/...` sem login leva para `/login`; depois de entrar, o usuário volta para a página que tinha pedido.
+- A sessão fica no `sessionStorage`: dura enquanto a aba estiver aberta. O botão **Sair** encerra a sessão.
+- Usuários e senha ficam em `src/app/core/autenticacao.ts`; a guarda de rota é `exigeLogin`.
+
+> **Importante:** é um login **simulado**, só para demonstração do projeto acadêmico. A conferência acontece no navegador e a API continua aberta (o Swagger segue acessível para a avaliação). Em produção, o correto seria autenticação na API (por exemplo, Spring Security com token JWT). A senha é fictícia e não é senha real de ninguém.
 
 ## Arquitetura
 
@@ -56,6 +76,7 @@ Interface web do **Cidadão Fácil**: o cidadão descreve o que precisa com as p
 src/app/
 ├── core/
 │   ├── api.ts                 # todas as chamadas HTTP à API Java
+│   ├── autenticacao.ts        # login simulado do painel + guarda de rota
 │   ├── models.ts              # tipos = DTOs da API
 │   ├── preferencias.ts        # fonte e alto contraste
 │   ├── salvos.ts              # serviços salvos (localStorage)
@@ -69,13 +90,13 @@ Angular 22 · componentes standalone · signals · controle de fluxo `@if/@for` 
 ## Como executar
 
 ### Online (sem instalar nada)
-Acesse https://techverse-gs-2-frontend.onrender.com. O site já está ligado à API publicada no Render, com os dados no Oracle da FIAP.
+Acesse https://VERCEL_URL. O site já está ligado à API publicada no Render, com os dados no Oracle da FIAP.
 
 Roteiro sugerido:
 1. Na tela inicial, escreva *“estou desempregado e quero um curso gratuito”*.
 2. Abra um dos serviços recomendados e marque os documentos no checklist.
-3. Em **Painel**, veja a lista de serviços, edite um e confira os **Indicadores**.
-4. Teste **A+ / A-** e **Alto contraste** na barra do topo.
+3. Em **Painel**, entre com um RM da tabela acima e a senha `techverse2026`; veja a lista de serviços, edite um e confira os **Indicadores**.
+4. Teste **A+ / A-** e **Alto contraste** na barra do topo (no celular, pelo botão **Aa**).
 
 ### Localmente
 Requisitos: **Node.js 22+** e npm.
@@ -101,17 +122,20 @@ Para usar a API rodando no seu computador (`http://localhost:8080`), troque `use
 
 O build gera os arquivos em `dist/cidadao-facil-web/browser`.
 
-### Deploy no Render (Static Site)
-O site está publicado em https://techverse-gs-2-frontend.onrender.com com esta configuração:
+### Deploy no Vercel
+O site está publicado em https://VERCEL_URL (plano Hobby, gratuito). A configuração fica no `vercel.json` da raiz:
 
 | Campo | Valor |
 |---|---|
-| Tipo | Static Site |
-| Build Command | `npm ci && npm run build` |
-| Publish Directory | `dist/cidadao-facil-web/browser` |
-| Redirects/Rewrites | `/*` → `/index.html` (Rewrite), para as rotas do Angular funcionarem ao recarregar a página |
+| Framework | Angular |
+| Install Command | `npm ci` |
+| Build Command | `npm run build` |
+| Output Directory | `dist/cidadao-facil-web/browser` |
+| Rewrites | `/(.*)` → `/index.html`, para as rotas do Angular funcionarem ao recarregar a página |
 
-Cada commit na branch `main` gera um novo deploy automaticamente. A mesma configuração está no `render.yaml` da raiz (New › Blueprint).
+Cada commit na branch `main` gera um novo deploy automaticamente. A API continua no Render (https://cidadao-facil-api.onrender.com).
+
+Para publicar uma cópia: em https://vercel.com, **Add New › Project**, importe este repositório e clique em **Deploy** (os campos acima já vêm do `vercel.json`).
 
 ## Integrantes
 

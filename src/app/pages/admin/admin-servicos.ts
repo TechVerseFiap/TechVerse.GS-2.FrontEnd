@@ -33,7 +33,7 @@ import { Icone } from '../../shared/icone';
         <app-erro [mensagem]="erro()" (tentar)="carregar()" />
       } @else {
         <div class="tabela-caixa">
-          <table class="tabela">
+          <table class="tabela tabela-responsiva">
             <caption class="sr-only">Serviços cadastrados no catálogo</caption>
             <thead>
               <tr>
@@ -47,17 +47,17 @@ import { Icone } from '../../shared/icone';
             <tbody>
               @for (s of servicos(); track s.id) {
                 <tr>
-                  <td><strong>{{ s.nome }}</strong></td>
-                  <td>{{ s.categoria }}</td>
-                  <td>{{ canal[s.canal] }}</td>
-                  <td>
+                  <td data-label="Serviço"><strong>{{ s.nome }}</strong></td>
+                  <td data-label="Categoria">{{ s.categoria }}</td>
+                  <td data-label="Canal">{{ canal[s.canal] }}</td>
+                  <td data-label="Situação">
                     @if (s.precisaReverificacao) {
                       <span class="chip chip-atencao">Reverificar fonte</span>
                     } @else {
                       <span class="chip chip-neutro">Em dia</span>
                     }
                   </td>
-                  <td>
+                  <td class="celula-acoes">
                     @if (confirmando() === s.id) {
                       <div class="linha" style="gap: 6px; flex-wrap: nowrap">
                         <button type="button" class="botao botao-perigo-cheio botao-pequeno" (click)="excluir(s)">Confirmar exclusão</button>
