@@ -8,7 +8,7 @@ Interface web do **Cidadão Fácil**: o cidadão descreve o que precisa com as p
 
 | | Link |
 |---|---|
-| **Site publicado (front-end, Vercel)** | https://VERCEL_URL |
+| **Site publicado (front-end, Vercel)** | https://cidadao-facil-techverse.vercel.app |
 | **API publicada (Java / Spring Boot)** | https://cidadao-facil-api.onrender.com |
 | **Swagger da API** | https://cidadao-facil-api.onrender.com/swagger-ui.html |
 | **Repositório da API** | https://github.com/TechVerseFiap/TechVerse.GS-2.BackEnd |
@@ -90,7 +90,7 @@ Angular 22 · componentes standalone · signals · controle de fluxo `@if/@for` 
 ## Como executar
 
 ### Online (sem instalar nada)
-Acesse https://VERCEL_URL. O site já está ligado à API publicada no Render, com os dados no Oracle da FIAP.
+Acesse https://cidadao-facil-techverse.vercel.app. O site já está ligado à API publicada no Render, com os dados no Oracle da FIAP.
 
 Roteiro sugerido:
 1. Na tela inicial, escreva *“estou desempregado e quero um curso gratuito”*.
@@ -123,7 +123,7 @@ Para usar a API rodando no seu computador (`http://localhost:8080`), troque `use
 O build gera os arquivos em `dist/cidadao-facil-web/browser`.
 
 ### Deploy no Vercel
-O site está publicado em https://VERCEL_URL (plano Hobby, gratuito). A configuração fica no `vercel.json` da raiz:
+O site está publicado em https://cidadao-facil-techverse.vercel.app (plano Hobby, gratuito). A configuração fica no `vercel.json` da raiz:
 
 | Campo | Valor |
 |---|---|
