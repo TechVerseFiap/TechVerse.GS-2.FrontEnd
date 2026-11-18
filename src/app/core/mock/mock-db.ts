@@ -114,6 +114,13 @@ export function criarMockDb(): MockDb {
       { servicoId: 6, documentoId: 1, observacao: 'Preferencialmente de todos da família.', obrigatorio: true },
       { servicoId: 6, documentoId: 3, observacao: 'Ou declaração de residência.', obrigatorio: false },
     ],
-    interacoes: [],
+    // Mesmas interações demonstrativas da carga do banco (02_DML.sql)
+    interacoes: [
+      { id: 1, resultado: 'ENCONTRADO', servicoIds: [2, 3] },
+      { id: 2, resultado: 'ENCONTRADO', servicoIds: [4] },
+      { id: 3, resultado: 'ENCONTRADO', servicoIds: [5] },
+      { id: 4, resultado: 'PEDIU_ESCLARECIMENTO', servicoIds: [6] },
+      { id: 5, resultado: 'NAO_ENCONTRADO', servicoIds: [] },
+    ],
   };
 }
