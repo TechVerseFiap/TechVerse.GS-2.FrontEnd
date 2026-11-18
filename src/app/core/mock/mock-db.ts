@@ -1,14 +1,16 @@
-import { Canal, Categoria, Documento } from '../models';
+import { Canal, Categoria, Documento, Orgao } from '../models';
 
-// Banco em memória do modo demonstração (mesmos dados do DataSeeder da API)
+// Banco em memória do modo demonstração (mesmos dados da carga Flyway / scripts de Database)
 export interface ServicoMock {
   id: number;
   categoriaId: number;
   nome: string;
   descricao: string;
   publicoAlvo: string | null;
-  orgaoResponsavel: string;
+  orgaoId: number;
   canal: Canal;
+  presencial: string | null;
+  fonteTitulo: string;
   urlFonte: string;
   dataVerificacao: string;
   palavrasChave: string | null;
@@ -16,11 +18,12 @@ export interface ServicoMock {
 
 export interface RequisitoMock { id: number; servicoId: number; descricao: string; }
 export interface EtapaMock { id: number; servicoId: number; ordem: number; descricao: string; }
-export interface VinculoMock { servicoId: number; documentoId: number; observacao: string | null; }
+export interface VinculoMock { servicoId: number; documentoId: number; observacao: string | null; obrigatorio: boolean; }
 export interface InteracaoMock { id: number; resultado: string; servicoIds: number[]; }
 
 export interface MockDb {
   categorias: Categoria[];
+  orgaos: Orgao[];
   documentos: Documento[];
   servicos: ServicoMock[];
   requisitos: RequisitoMock[];
@@ -42,6 +45,13 @@ export function criarMockDb(): MockDb {
       { id: 4, nome: 'Benefícios', descricao: 'Programas sociais e cadastros para acesso a benefícios.' },
       { id: 5, nome: 'Saúde', descricao: 'Categoria reservada para a próxima versão do catálogo.' },
     ],
+    orgaos: [
+      { id: 1, nome: 'Ministério do Trabalho e Emprego', sigla: 'MTE', esfera: 'FEDERAL' },
+      { id: 2, nome: 'Ministério do Desenvolvimento e Assistência Social, Família e Combate à Fome', sigla: 'MDS', esfera: 'FEDERAL' },
+      { id: 3, nome: 'Ministério da Gestão e da Inovação em Serviços Públicos', sigla: 'MGI', esfera: 'FEDERAL' },
+      { id: 4, nome: 'Institutos de identificação dos estados', sigla: 'II-UF', esfera: 'ESTADUAL' },
+      { id: 5, nome: 'Prefeitura municipal (CRAS / posto do Cadastro Único)', sigla: 'CRAS', esfera: 'MUNICIPAL' },
+    ],
     documentos: [
       { id: 1, nome: 'CPF', descricao: 'Cadastro de Pessoa Física. Número usado para identificar você nos serviços públicos.' },
       { id: 2, nome: 'Documento de identidade com foto', descricao: 'RG, Carteira de Identidade Nacional (CIN) ou outro documento oficial com foto.' },
@@ -51,12 +61,12 @@ export function criarMockDb(): MockDb {
       { id: 6, nome: 'Conta gov.br', descricao: 'Login único do governo federal, criado com o CPF. Necessário para serviços digitais.' },
     ],
     servicos: [
-      { id: 1, categoriaId: 1, nome: 'Carteira de Trabalho Digital', descricao: 'Versão digital da carteira de trabalho. Mostra seus contratos e permite consultar vagas do Sine.', publicoAlvo: 'Qualquer pessoa com CPF', orgaoResponsavel: 'Ministério do Trabalho e Emprego', canal: 'DIGITAL', urlFonte: 'https://www.gov.br/pt-br/servicos/obter-a-carteira-de-trabalho', dataVerificacao: V, palavrasChave: 'carteira de trabalho,ctps,carteira digital,registro em carteira,contrato de trabalho' },
-      { id: 2, categoriaId: 1, nome: 'Seguro-Desemprego', descricao: 'Ajuda financeira temporária para quem foi demitido sem justa causa.', publicoAlvo: 'Trabalhadores com carteira assinada demitidos sem justa causa', orgaoResponsavel: 'Ministério do Trabalho e Emprego', canal: 'DIGITAL_E_PRESENCIAL', urlFonte: 'https://www.gov.br/pt-br/servicos/solicitar-o-seguro-desemprego', dataVerificacao: V, palavrasChave: 'seguro desemprego,desempregado,desempregada,demitido,demitida,demissao,perdi o emprego,mandado embora,sem justa causa' },
-      { id: 3, categoriaId: 1, nome: 'Buscar emprego no Sine', descricao: 'Cadastro no Sistema Nacional de Emprego para receber e consultar vagas.', publicoAlvo: 'Pessoas procurando trabalho com carteira assinada', orgaoResponsavel: 'Ministério do Trabalho e Emprego', canal: 'DIGITAL_E_PRESENCIAL', urlFonte: 'https://www.gov.br/pt-br/servicos/buscar-emprego-no-sistema-nacional-de-emprego-sine', dataVerificacao: V, palavrasChave: 'emprego,vaga,vagas,trabalho,sine,procurar emprego,curriculo,desempregado,desempregada' },
-      { id: 4, categoriaId: 2, nome: 'Cursos gratuitos - Escola do Trabalhador 4.0', descricao: 'Cursos online e gratuitos de tecnologia e produtividade do programa Caminho Digital.', publicoAlvo: 'Trabalhadores que querem se qualificar', orgaoResponsavel: 'Ministério do Trabalho e Emprego', canal: 'DIGITAL', urlFonte: 'https://www.gov.br/trabalho-e-emprego/pt-br/servicos/trabalhador/qualificacao-profissional/caminho-digital', dataVerificacao: V, palavrasChave: 'curso,gratuito,gratis,online,qualificacao,capacitacao,aprender,tecnologia,informatica,certificado' },
-      { id: 5, categoriaId: 3, nome: 'Carteira de Identidade Nacional (CIN)', descricao: 'Nova carteira de identidade, que usa o CPF como número. A primeira via é gratuita.', publicoAlvo: 'Todos os brasileiros', orgaoResponsavel: 'Institutos de identificação dos estados', canal: 'DIGITAL_E_PRESENCIAL', urlFonte: 'https://www.gov.br/identidade', dataVerificacao: V, palavrasChave: 'rg,identidade,cin,carteira de identidade,documento de identidade,segunda via,tirar documento' },
-      { id: 6, categoriaId: 4, nome: 'Inscrição no Cadastro Único (CadÚnico)', descricao: 'Cadastro que dá acesso a vários programas sociais do governo.', publicoAlvo: 'Famílias com renda de até meio salário mínimo por pessoa', orgaoResponsavel: 'Prefeitura (CRAS / posto do Cadastro Único)', canal: 'PRESENCIAL', urlFonte: 'https://www.gov.br/pt-br/servicos/inscrever-se-no-cadastro-unico-para-programas-sociais-do-governo-federal', dataVerificacao: V, palavrasChave: 'cadunico,cadastro unico,beneficio,bolsa familia,programa social,baixa renda,auxilio,cras' },
+      { id: 1, categoriaId: 1, nome: 'Carteira de Trabalho Digital', descricao: 'Versão digital da carteira de trabalho. Mostra seus contratos e permite consultar vagas do Sine.', publicoAlvo: 'Qualquer pessoa com CPF', orgaoId: 1, canal: 'DIGITAL', presencial: null, fonteTitulo: 'gov.br - Obter a Carteira de Trabalho', urlFonte: 'https://www.gov.br/pt-br/servicos/obter-a-carteira-de-trabalho', dataVerificacao: V, palavrasChave: 'carteira de trabalho,ctps,carteira digital,registro em carteira,contrato de trabalho' },
+      { id: 2, categoriaId: 1, nome: 'Seguro-Desemprego', descricao: 'Ajuda financeira temporária para quem foi demitido sem justa causa.', publicoAlvo: 'Trabalhadores com carteira assinada demitidos sem justa causa', orgaoId: 1, canal: 'DIGITAL_E_PRESENCIAL', presencial: 'Unidades do Sine e superintendências do trabalho, com atendimento agendado.', fonteTitulo: 'gov.br - Solicitar o Seguro-Desemprego', urlFonte: 'https://www.gov.br/pt-br/servicos/solicitar-o-seguro-desemprego', dataVerificacao: V, palavrasChave: 'seguro desemprego,desempregado,desempregada,demitido,demitida,demissao,perdi o emprego,mandado embora,sem justa causa' },
+      { id: 3, categoriaId: 1, nome: 'Buscar emprego no Sine', descricao: 'Cadastro no Sistema Nacional de Emprego para receber e consultar vagas.', publicoAlvo: 'Pessoas procurando trabalho com carteira assinada', orgaoId: 1, canal: 'DIGITAL_E_PRESENCIAL', presencial: 'Posto do Sine do seu município.', fonteTitulo: 'gov.br - Buscar emprego no Sine', urlFonte: 'https://www.gov.br/pt-br/servicos/buscar-emprego-no-sistema-nacional-de-emprego-sine', dataVerificacao: V, palavrasChave: 'emprego,vaga,vagas,trabalho,sine,procurar emprego,curriculo,desempregado,desempregada' },
+      { id: 4, categoriaId: 2, nome: 'Cursos gratuitos - Escola do Trabalhador 4.0', descricao: 'Cursos online e gratuitos de tecnologia e produtividade do programa Caminho Digital.', publicoAlvo: 'Trabalhadores que querem se qualificar', orgaoId: 1, canal: 'DIGITAL', presencial: null, fonteTitulo: 'gov.br - Caminho Digital (Escola do Trabalhador 4.0)', urlFonte: 'https://www.gov.br/trabalho-e-emprego/pt-br/servicos/trabalhador/qualificacao-profissional/caminho-digital', dataVerificacao: V, palavrasChave: 'curso,gratuito,gratis,online,qualificacao,capacitacao,aprender,tecnologia,informatica,certificado' },
+      { id: 5, categoriaId: 3, nome: 'Carteira de Identidade Nacional (CIN)', descricao: 'Nova carteira de identidade, que usa o CPF como número. A primeira via é gratuita.', publicoAlvo: 'Todos os brasileiros', orgaoId: 4, canal: 'DIGITAL_E_PRESENCIAL', presencial: 'Posto de identificação do seu estado, no dia agendado.', fonteTitulo: 'gov.br - Carteira de Identidade Nacional', urlFonte: 'https://www.gov.br/identidade', dataVerificacao: V, palavrasChave: 'rg,identidade,cin,carteira de identidade,documento de identidade,segunda via,tirar documento' },
+      { id: 6, categoriaId: 4, nome: 'Inscrição no Cadastro Único (CadÚnico)', descricao: 'Cadastro que dá acesso a vários programas sociais do governo.', publicoAlvo: 'Famílias com renda de até meio salário mínimo por pessoa', orgaoId: 5, canal: 'PRESENCIAL', presencial: 'CRAS ou posto do Cadastro Único da prefeitura.', fonteTitulo: 'gov.br - Inscrever-se no Cadastro Único', urlFonte: 'https://www.gov.br/pt-br/servicos/inscrever-se-no-cadastro-unico-para-programas-sociais-do-governo-federal', dataVerificacao: V, palavrasChave: 'cadunico,cadastro unico,beneficio,bolsa familia,programa social,baixa renda,auxilio,cras' },
     ],
     requisitos: [
       { id: 1, servicoId: 1, descricao: 'Ter CPF.' },
@@ -90,19 +100,19 @@ export function criarMockDb(): MockDb {
       { id: 17, servicoId: 6, ordem: 3, descricao: 'Faça a entrevista (cerca de 1 hora, gratuita).' },
     ],
     vinculos: [
-      { servicoId: 1, documentoId: 1, observacao: null },
-      { servicoId: 1, documentoId: 6, observacao: null },
-      { servicoId: 2, documentoId: 5, observacao: 'Entregue pelo empregador na demissão.' },
-      { servicoId: 2, documentoId: 1, observacao: null },
-      { servicoId: 2, documentoId: 6, observacao: 'Necessária para pedir pela internet.' },
-      { servicoId: 3, documentoId: 1, observacao: null },
-      { servicoId: 3, documentoId: 2, observacao: 'Para atendimento presencial.' },
-      { servicoId: 4, documentoId: 1, observacao: null },
-      { servicoId: 5, documentoId: 4, observacao: 'Original.' },
-      { servicoId: 5, documentoId: 1, observacao: null },
-      { servicoId: 6, documentoId: 2, observacao: 'Do responsável pela família.' },
-      { servicoId: 6, documentoId: 1, observacao: 'Preferencialmente de todos da família.' },
-      { servicoId: 6, documentoId: 3, observacao: 'Ou declaração de residência.' },
+      { servicoId: 1, documentoId: 1, observacao: null, obrigatorio: true },
+      { servicoId: 1, documentoId: 6, observacao: null, obrigatorio: true },
+      { servicoId: 2, documentoId: 5, observacao: 'Entregue pelo empregador na demissão.', obrigatorio: true },
+      { servicoId: 2, documentoId: 1, observacao: null, obrigatorio: true },
+      { servicoId: 2, documentoId: 6, observacao: 'Necessária para pedir pela internet.', obrigatorio: false },
+      { servicoId: 3, documentoId: 1, observacao: null, obrigatorio: true },
+      { servicoId: 3, documentoId: 2, observacao: 'Para atendimento presencial.', obrigatorio: false },
+      { servicoId: 4, documentoId: 1, observacao: null, obrigatorio: true },
+      { servicoId: 5, documentoId: 4, observacao: 'Original.', obrigatorio: true },
+      { servicoId: 5, documentoId: 1, observacao: null, obrigatorio: true },
+      { servicoId: 6, documentoId: 2, observacao: 'Do responsável pela família.', obrigatorio: true },
+      { servicoId: 6, documentoId: 1, observacao: 'Preferencialmente de todos da família.', obrigatorio: true },
+      { servicoId: 6, documentoId: 3, observacao: 'Ou declaração de residência.', obrigatorio: false },
     ],
     interacoes: [],
   };

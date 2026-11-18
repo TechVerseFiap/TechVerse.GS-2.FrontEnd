@@ -32,7 +32,7 @@ import { Icone } from '../../shared/icone';
           </div>
           <div class="campo">
             <label for="d-desc">Para que serve (linguagem simples)</label>
-            <input id="d-desc" class="entrada" maxlength="300" [value]="descricao()" (input)="descricao.set($any($event.target).value)" />
+            <input id="d-desc" class="entrada" maxlength="400" [value]="descricao()" (input)="descricao.set($any($event.target).value)" />
           </div>
         </div>
         <div class="linha">

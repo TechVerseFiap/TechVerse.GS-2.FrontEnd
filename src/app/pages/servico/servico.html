@@ -24,7 +24,10 @@
           </div>
           <h1>{{ s.nome }}</h1>
           <p class="m-0 descricao">{{ s.descricao }}</p>
-          <p class="m-0 texto-suave">Responsável: <strong>{{ s.orgaoResponsavel }}</strong></p>
+          <p class="m-0 texto-suave">
+            Responsável: <strong>{{ s.orgaoResponsavel }}</strong>
+            @if (s.orgao) { <span>&nbsp;({{ s.orgao.sigla }} · esfera {{ esfera[s.orgao.esfera].toLowerCase() }})</span> }
+          </p>
         </header>
 
         @if (s.publicoAlvo) {
@@ -69,6 +72,9 @@
                   />
                   <label [for]="'doc-' + d.documentoId">
                     <strong>{{ d.nome }}</strong>
+                    @if (d.obrigatorio === false) {
+                      <span class="chip chip-neutro chip-mini">se aplicável</span>
+                    }
                     @if (d.observacao) {
                       <span class="obs"> — {{ d.observacao }}</span>
                     }
@@ -108,9 +114,15 @@
             <app-icone nome="externo" [tamanho]="18" />
             <span class="sr-only">(abre em nova aba)</span>
           </a>
+          @for (c of presenciais(s); track $index) {
+            <p class="m-0 presencial">
+              <app-icone nome="local" [tamanho]="18" />
+              <span><strong>Atendimento presencial:</strong> {{ c.endereco }}</span>
+            </p>
+          }
           <p class="m-0 texto-pequeno texto-suave fonte">
             <app-icone nome="check" [tamanho]="16" />
-            Fonte: {{ dominio(s.urlFonte) }} · verificado em {{ s.dataVerificacao | date: 'dd/MM/yyyy' }}
+            <span>Fonte: {{ s.fonte?.titulo ?? dominio(s.urlFonte) }} · verificado em {{ s.dataVerificacao | date: 'dd/MM/yyyy' }}</span>
           </p>
           <button type="button" class="botao botao-secundario" [attr.aria-pressed]="salvos.estaSalvo(s.id)" (click)="alternarSalvo(s)">
             <app-icone nome="salvar" [tamanho]="18" />

@@ -25,11 +25,11 @@ import { Icone } from '../../shared/icone';
         <div class="grade-form">
           <div class="campo">
             <label for="c-nome">Nome *</label>
-            <input id="c-nome" class="entrada" maxlength="60" [value]="nome()" (input)="nome.set($any($event.target).value)" />
+            <input id="c-nome" class="entrada" maxlength="80" [value]="nome()" (input)="nome.set($any($event.target).value)" />
           </div>
           <div class="campo">
             <label for="c-desc">Descrição</label>
-            <input id="c-desc" class="entrada" maxlength="255" [value]="descricao()" (input)="descricao.set($any($event.target).value)" />
+            <input id="c-desc" class="entrada" maxlength="300" [value]="descricao()" (input)="descricao.set($any($event.target).value)" />
           </div>
         </div>
         <div class="linha">

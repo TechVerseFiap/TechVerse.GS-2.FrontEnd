@@ -52,6 +52,8 @@
 .alto-contraste .etapa-numero { color: #000; }
 .etapas li span:last-child { padding-top: 4px; }
 .fonte { display: flex; gap: 6px; align-items: flex-start; }
+.presencial { display: flex; gap: 8px; align-items: flex-start; }
+.presencial app-icone { margin-top: 2px; color: var(--azul); }
 @media (max-width: 860px) {
   .lateral { position: static; }
 }

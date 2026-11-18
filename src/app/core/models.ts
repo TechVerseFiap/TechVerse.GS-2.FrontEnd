@@ -15,12 +15,41 @@ export interface CategoriaRequest {
   descricao: string | null;
 }
 
+export type Esfera = 'FEDERAL' | 'ESTADUAL' | 'MUNICIPAL';
+
+export interface Orgao {
+  id: number;
+  nome: string;
+  sigla: string;
+  esfera: Esfera;
+}
+
+export interface OrgaoRequest {
+  nome: string;
+  sigla: string;
+  esfera: Esfera;
+}
+
+export interface Fonte {
+  id: number;
+  titulo: string;
+  url: string;
+  tipo: 'OFICIAL' | 'APOIO';
+  dataConsulta: string;
+}
+
+export interface CanalInfo {
+  tipo: 'DIGITAL' | 'PRESENCIAL';
+  endereco: string | null;
+}
+
 export interface ServicoResumo {
   id: number;
   nome: string;
   descricao: string;
   categoriaId: number;
   categoria: string;
+  orgaoId?: number;
   orgaoResponsavel: string;
   canal: Canal;
   precisaReverificacao: boolean;
@@ -55,11 +84,13 @@ export interface DocumentoDoServico {
   nome: string;
   descricao: string | null;
   observacao: string | null;
+  obrigatorio?: boolean;
 }
 
 export interface VinculoDocumento {
   documentoId: number;
   observacao: string | null;
+  obrigatorio?: boolean;
 }
 
 export interface ServicoDetalhe {
@@ -68,8 +99,11 @@ export interface ServicoDetalhe {
   descricao: string;
   publicoAlvo: string | null;
   categoria: Categoria;
+  orgao?: Orgao;
   orgaoResponsavel: string;
   canal: Canal;
+  canais?: CanalInfo[];
+  fonte?: Fonte;
   urlFonte: string;
   dataVerificacao: string;
   precisaReverificacao: boolean;
@@ -85,7 +119,7 @@ export interface ServicoRequest {
   nome: string;
   descricao: string;
   publicoAlvo: string | null;
-  orgaoResponsavel: string;
+  orgaoId: number;
   canal: Canal;
   urlFonte: string;
   dataVerificacao: string;
@@ -99,7 +133,8 @@ export interface ServicoRecomendado {
   orgaoResponsavel: string;
   urlFonte: string;
   justificativa: string;
-  pontuacao: number;
+  posicao?: number;
+  pontuacao: number | null;
 }
 
 export interface RespostaAssistente {
@@ -120,6 +155,32 @@ export interface Indicadores {
   taxaOrientacaoEncontrada: number;
 }
 
+// Panorama do município (dados públicos agregados da Base dos Dados)
+export interface Municipio {
+  codigoIbge: number;
+  nome: string;
+  uf: string;
+}
+
+export interface ValorPanorama {
+  codigo: string;
+  nome: string;
+  descricao: string;
+  valor: number;
+  unidade: string;
+  referencia: string;
+  periodo: string;
+  fonte: string;
+  urlFonte: string;
+  dataConsulta: string;
+}
+
+export interface Panorama {
+  municipio: Municipio;
+  indicadores: ValorPanorama[];
+  aviso: string;
+}
+
 export interface ErroApi {
   timestamp: string;
   status: number;
@@ -128,6 +189,12 @@ export interface ErroApi {
   caminho: string;
   campos?: { campo: string; mensagem: string }[];
 }
+
+export const ESFERA_ROTULO: Record<Esfera, string> = {
+  FEDERAL: 'Federal',
+  ESTADUAL: 'Estadual',
+  MUNICIPAL: 'Municipal',
+};
 
 export const CANAL_ROTULO: Record<Canal, string> = {
   DIGITAL: '100% digital',

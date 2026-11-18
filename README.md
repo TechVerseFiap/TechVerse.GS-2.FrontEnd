@@ -32,12 +32,14 @@ Interface web do **Cidadão Fácil**: o cidadão descreve o que precisa com as p
 | `/` | Início: pergunta livre, exemplos, categorias, destaques | `GET /api/categorias`, `GET /api/servicos` |
 | `/assistente?q=` | Conversa com o assistente e recomendações | `POST /api/assistente/perguntas` |
 | `/categorias/:id` | Serviços de uma categoria, com filtro | `GET /api/categorias/{id}`, `GET /api/servicos?categoria=` |
-| `/servicos/:id` | Detalhe: requisitos, checklist de documentos, etapas, fonte | `GET /api/servicos/{id}` |
+| `/servicos/:id` | Detalhe: órgão e esfera, requisitos, checklist de documentos (obrigatórios e “se aplicável”), etapas, atendimento presencial, fonte | `GET /api/servicos/{id}` |
+| `/panorama?cidade=` | Panorama da cidade: busca entre os 645 municípios de SP e mostra população (IBGE), saldo de empregos (CAGED), Bolsa Família (CGU) e unidades do SUS (CNES), com fonte e período | `GET /api/municipios?busca=`, `GET /api/municipios/{codigoIbge}/panorama` |
 | `/salvos` | Serviços salvos neste aparelho | (local, sem servidor) |
 | `/login` | Entrada no painel da equipe (login simulado) | (local, sem servidor) |
 | `/admin/servicos` | Lista e exclusão de serviços | `GET`, `DELETE /api/servicos` |
-| `/admin/servicos/novo` e `/:id` | Cadastro/edição + requisitos, etapas e documentos | `POST`, `PUT /api/servicos`, `/requisitos`, `/etapas`, `/documentos` |
+| `/admin/servicos/novo` e `/:id` | Cadastro/edição (com órgão responsável) + requisitos, etapas e documentos | `POST`, `PUT /api/servicos`, `GET /api/orgaos`, `/requisitos`, `/etapas`, `/documentos` |
 | `/admin/categorias` | CRUD de categorias | `GET`, `POST`, `PUT`, `DELETE /api/categorias` |
+| `/admin/orgaos` | CRUD de órgãos responsáveis (sigla e esfera) | `GET`, `POST`, `PUT`, `DELETE /api/orgaos` |
 | `/admin/documentos` | CRUD de documentos | `GET`, `POST`, `PUT`, `DELETE /api/documentos` |
 | `/admin/indicadores` | Indicador de impacto | `GET /api/assistente/indicadores` |
 
@@ -48,6 +50,7 @@ Interface web do **Cidadão Fácil**: o cidadão descreve o que precisa com as p
 - **Honestidade**: quando não encontra nada, o assistente diz isso e oferece saídas (reescrever ou escolher um assunto).
 - **Acessibilidade**: fonte *Atkinson Hyperlegible* (criada para baixa visão), contraste ≥ 4.5:1, modo **alto contraste**, **A+ / A-**, link “Pular para o conteúdo”, foco visível, alvos de toque ≥ 44 px, rótulos em todos os campos, mensagens de erro ligadas aos campos (`aria-describedby`), respostas do assistente anunciadas a leitores de tela (`aria-live`), respeito a “reduzir movimento”.
 - **Mobile first**: todas as telas funcionam em 360 px. No celular, o topo fica compacto (aviso em uma linha e opções de acessibilidade no botão **Aa**), a navegação vai para uma barra fixa embaixo, como em aplicativos, e as tabelas do painel viram cartões.
+- **Dados públicos com contexto**: o panorama mostra só números agregados por município, sempre com fonte, período e o aviso de que não indicam direito a benefício.
 - **Privacidade**: o cidadão não faz login nem informa CPF ou documentos. “Salvos” fica só no navegador. Só o painel da equipe pede login.
 - **Identidade**: paleta inspirada no padrão visual de serviços públicos digitais (azul institucional + amarelo), **sem usar marcas oficiais** e com aviso fixo de que não é um site do governo.
 

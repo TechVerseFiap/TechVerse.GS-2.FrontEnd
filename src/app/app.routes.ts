@@ -24,6 +24,11 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/servico/servico').then((m) => m.ServicoPagina),
   },
   {
+    path: 'panorama',
+    title: 'Panorama da cidade — Cidadão Fácil',
+    loadComponent: () => import('./pages/panorama/panorama').then((m) => m.PanoramaPagina),
+  },
+  {
     path: 'salvos',
     title: 'Serviços salvos — Cidadão Fácil',
     loadComponent: () => import('./pages/salvos/salvos').then((m) => m.SalvosPagina),
@@ -58,6 +63,11 @@ export const routes: Routes = [
         path: 'categorias',
         title: 'Painel · Categorias — Cidadão Fácil',
         loadComponent: () => import('./pages/admin/admin-categorias').then((m) => m.AdminCategorias),
+      },
+      {
+        path: 'orgaos',
+        title: 'Painel · Órgãos — Cidadão Fácil',
+        loadComponent: () => import('./pages/admin/admin-orgaos').then((m) => m.AdminOrgaos),
       },
       {
         path: 'documentos',

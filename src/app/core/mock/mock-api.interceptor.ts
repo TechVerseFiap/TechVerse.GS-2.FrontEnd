@@ -8,8 +8,11 @@ import {
 import { Observable, delay, of, throwError } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import {
+  CanalInfo,
   Categoria,
   DocumentoDoServico,
+  Fonte,
+  Orgao,
   RespostaAssistente,
   ServicoDetalhe,
   ServicoRecomendado,
@@ -17,6 +20,7 @@ import {
   ServicoResumo,
 } from '../models';
 import { MockDb, ServicoMock, criarMockDb } from './mock-db';
+import { MUNICIPIOS_DEMO, panoramaDemo } from './mock-panorama';
 
 const db: MockDb = criarMockDb();
 const ATRASO_MS = 250;
@@ -86,6 +90,57 @@ function responder(req: HttpRequest<unknown>, caminho: string): Observable<HttpE
   if ((r = caminho.match(/^\/categorias\/(\d+)\/servicos$/)) && m === 'GET') {
     categoria(+r[1], caminho);
     return ok(db.servicos.filter((s) => s.categoriaId === +r![1]).map(resumo));
+  }
+
+  // Órgãos
+  if (caminho === '/orgaos' && m === 'GET') return ok([...db.orgaos].sort((a, b) => a.nome.localeCompare(b.nome)));
+  if (caminho === '/orgaos' && m === 'POST') {
+    const o = dadosOrgao(body, caminho);
+    if (db.orgaos.some((x) => x.sigla === o.sigla)) erro(409, `Já existe um órgão com a sigla '${o.sigla}'.`, caminho);
+    const novo: Orgao = { id: ++db.seq, ...o };
+    db.orgaos.push(novo);
+    return ok(novo, 201);
+  }
+  if ((r = caminho.match(/^\/orgaos\/(\d+)$/))) {
+    const o = orgao(+r[1], caminho);
+    if (m === 'GET') return ok(o);
+    if (m === 'PUT') {
+      const d = dadosOrgao(body, caminho);
+      if (db.orgaos.some((x) => x.id !== o.id && x.sigla === d.sigla)) erro(409, `Já existe outro órgão com a sigla '${d.sigla}'.`, caminho);
+      Object.assign(o, d);
+      return ok(o);
+    }
+    if (m === 'DELETE') {
+      const qtd = db.servicos.filter((s) => s.orgaoId === o.id).length;
+      if (qtd > 0) erro(409, `O órgão '${o.nome}' é responsável por ${qtd} serviço(s). Troque o órgão desses serviços antes de excluir.`, caminho);
+      db.orgaos = db.orgaos.filter((x) => x !== o);
+      return ok(null, 204);
+    }
+  }
+
+  // Fontes
+  if (caminho === '/fontes' && m === 'GET') {
+    const vistas = new Map<string, Fonte>();
+    db.servicos.forEach((s) => vistas.set(s.urlFonte, fonte(s)));
+    return ok([...vistas.values()].sort((a, b) => a.titulo.localeCompare(b.titulo)));
+  }
+
+  // Panorama do município (amostra dos maiores municípios de SP)
+  if (caminho === '/municipios' && m === 'GET') {
+    const termo = normalizar(req.params.get('busca') ?? '');
+    if (termo.length < 2) erro(422, 'Digite pelo menos 2 letras do nome do município.', caminho);
+    const nivel = (n: string) => (n === termo ? 0 : n.startsWith(termo) ? 1 : n.includes(' ' + termo) ? 2 : n.includes(termo) ? 3 : -1);
+    return ok(
+      MUNICIPIOS_DEMO.map((mu) => ({ mu, n: nivel(normalizar(mu.nome)) }))
+        .filter((x) => x.n >= 0)
+        .sort((a, b) => a.n - b.n || b.mu.populacao - a.mu.populacao)
+        .slice(0, 20)
+        .map(({ mu }) => ({ codigoIbge: mu.codigoIbge, nome: mu.nome, uf: mu.uf })),
+    );
+  }
+  if ((r = caminho.match(/^\/municipios\/(\d+)(\/panorama)?$/)) && m === 'GET') {
+    const p = panoramaDemo(+r[1]) ?? erro(404, `Município com id ${r[1]} não foi encontrado(a). No modo demonstração há só uma amostra de cidades.`, caminho);
+    return ok(r[2] ? p : p.municipio);
   }
 
   // Serviços
@@ -194,9 +249,9 @@ function responder(req: HttpRequest<unknown>, caminho: string): Observable<HttpE
       const docId = Number(body['documentoId']);
       const d = db.documentos.find((x) => x.id === docId) ?? erro(404, `Documento com id ${docId} não foi encontrado(a).`, caminho);
       if (db.vinculos.some((v) => v.servicoId === s.id && v.documentoId === docId)) erro(409, `O documento '${d.nome}' já está vinculado a este serviço.`, caminho);
-      const v = { servicoId: s.id, documentoId: docId, observacao: (body['observacao'] as string) || null };
+      const v = { servicoId: s.id, documentoId: docId, observacao: (body['observacao'] as string) || null, obrigatorio: body['obrigatorio'] !== false };
       db.vinculos.push(v);
-      return ok({ documentoId: d.id, nome: d.nome, descricao: d.descricao, observacao: v.observacao }, 201);
+      return ok({ documentoId: d.id, nome: d.nome, descricao: d.descricao, observacao: v.observacao, obrigatorio: v.obrigatorio }, 201);
     }
   }
   if ((r = caminho.match(/^\/servicos\/(\d+)\/documentos\/(\d+)$/)) && m === 'DELETE') {
@@ -229,6 +284,30 @@ function categoria(id: number, caminho: string): Categoria {
   return db.categorias.find((c) => c.id === id) ?? erro(404, `Categoria com id ${id} não foi encontrado(a).`, caminho);
 }
 
+function orgao(id: number, caminho: string): Orgao {
+  return db.orgaos.find((o) => o.id === id) ?? erro(404, `Órgão com id ${id} não foi encontrado(a).`, caminho);
+}
+
+function dadosOrgao(b: Record<string, unknown>, caminho: string): Omit<Orgao, 'id'> {
+  const nome = String(b['nome'] ?? '').trim();
+  const sigla = String(b['sigla'] ?? '').trim().toUpperCase();
+  const esfera = b['esfera'] as Orgao['esfera'];
+  if (!nome || !sigla) erro(400, 'Nome e sigla são obrigatórios.', caminho);
+  if (!['FEDERAL', 'ESTADUAL', 'MUNICIPAL'].includes(esfera)) erro(400, 'A esfera é obrigatória (FEDERAL, ESTADUAL ou MUNICIPAL).', caminho);
+  return { nome, sigla, esfera };
+}
+
+function fonte(s: ServicoMock): Fonte {
+  return { id: s.id, titulo: s.fonteTitulo, url: s.urlFonte, tipo: 'OFICIAL', dataConsulta: s.dataVerificacao };
+}
+
+function canais(s: ServicoMock): CanalInfo[] {
+  const lista: CanalInfo[] = [];
+  if (s.canal !== 'PRESENCIAL') lista.push({ tipo: 'DIGITAL', endereco: s.urlFonte });
+  if (s.canal !== 'DIGITAL') lista.push({ tipo: 'PRESENCIAL', endereco: s.presencial ?? 'Consulte os locais de atendimento na fonte oficial.' });
+  return lista;
+}
+
 function servico(id: number, caminho: string): ServicoMock {
   return db.servicos.find((s) => s.id === id) ?? erro(404, `Serviço com id ${id} não foi encontrado(a).`, caminho);
 }
@@ -241,7 +320,8 @@ function resumo(s: ServicoMock): ServicoResumo {
   const c = db.categorias.find((x) => x.id === s.categoriaId)!;
   return {
     id: s.id, nome: s.nome, descricao: s.descricao, categoriaId: c.id, categoria: c.nome,
-    orgaoResponsavel: s.orgaoResponsavel, canal: s.canal, precisaReverificacao: precisaReverificacao(s.dataVerificacao),
+    orgaoId: s.orgaoId, orgaoResponsavel: orgao(s.orgaoId, '').nome, canal: s.canal,
+    precisaReverificacao: precisaReverificacao(s.dataVerificacao),
   };
 }
 
@@ -254,13 +334,25 @@ function documentosDe(servicoId: number): DocumentoDoServico[] {
     .filter((v) => v.servicoId === servicoId)
     .map((v) => {
       const d = db.documentos.find((x) => x.id === v.documentoId)!;
-      return { documentoId: d.id, nome: d.nome, descricao: d.descricao, observacao: v.observacao };
+      return { documentoId: d.id, nome: d.nome, descricao: d.descricao, observacao: v.observacao, obrigatorio: v.obrigatorio };
     });
 }
 
 function detalhe(s: ServicoMock): ServicoDetalhe {
+  const o = orgao(s.orgaoId, '');
   return {
-    ...s,
+    id: s.id,
+    nome: s.nome,
+    descricao: s.descricao,
+    publicoAlvo: s.publicoAlvo,
+    orgao: o,
+    orgaoResponsavel: o.nome,
+    canal: s.canal,
+    canais: canais(s),
+    fonte: fonte(s),
+    urlFonte: s.urlFonte,
+    dataVerificacao: s.dataVerificacao,
+    palavrasChave: s.palavrasChave,
     categoria: db.categorias.find((c) => c.id === s.categoriaId)!,
     precisaReverificacao: precisaReverificacao(s.dataVerificacao),
     requisitos: db.requisitos.filter((x) => x.servicoId === s.id),
@@ -274,13 +366,17 @@ function preencher(s: ServicoMock, b: ServicoRequest, caminho: string): void {
   const url = (b.urlFonte ?? '').trim().toLowerCase();
   if (!url.startsWith('https://')) erro(422, 'A URL da fonte oficial deve começar com https://', caminho);
   categoria(b.categoriaId, caminho);
+  orgao(Number(b.orgaoId), caminho);
+  const mesmaFonte = s.urlFonte === b.urlFonte.trim();
   Object.assign(s, {
     categoriaId: b.categoriaId,
     nome: b.nome.trim(),
     descricao: b.descricao.trim(),
     publicoAlvo: b.publicoAlvo,
-    orgaoResponsavel: b.orgaoResponsavel.trim(),
+    orgaoId: Number(b.orgaoId),
     canal: b.canal,
+    presencial: s.presencial ?? null,
+    fonteTitulo: mesmaFonte && s.fonteTitulo ? s.fonteTitulo : 'Fonte oficial informada no cadastro',
     urlFonte: b.urlFonte.trim(),
     dataVerificacao: b.dataVerificacao,
     palavrasChave: b.palavrasChave
@@ -316,9 +412,10 @@ function assistente(mensagem: string, caminho: string): RespostaAssistente {
     .sort((a, b) => b.pontos - a.pontos || a.s.nome.localeCompare(b.s.nome))
     .slice(0, 3);
 
-  const rec = (s: ServicoMock, justificativa: string, pontuacao: number): ServicoRecomendado => ({
-    servicoId: s.id, nome: s.nome, categoria: resumo(s).categoria, orgaoResponsavel: s.orgaoResponsavel,
-    urlFonte: s.urlFonte, justificativa, pontuacao,
+  let posicao = 0;
+  const rec = (s: ServicoMock, justificativa: string, pontuacao: number | null): ServicoRecomendado => ({
+    servicoId: s.id, nome: s.nome, categoria: resumo(s).categoria, orgaoResponsavel: orgao(s.orgaoId, '').nome,
+    urlFonte: s.urlFonte, justificativa, posicao: ++posicao, pontuacao,
   });
 
   const id = ++db.seq;

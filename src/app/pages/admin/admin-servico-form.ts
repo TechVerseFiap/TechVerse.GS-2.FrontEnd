@@ -3,7 +3,7 @@ import { ChangeDetectionStrategy, Component, OnInit, computed, inject, input, si
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { Api, mensagemDeErro } from '../../core/api';
-import { Canal, CANAL_ROTULO, Categoria, Documento, ServicoDetalhe, ServicoRequest } from '../../core/models';
+import { Canal, CANAL_ROTULO, Categoria, Documento, ESFERA_ROTULO, Orgao, ServicoDetalhe, ServicoRequest } from '../../core/models';
 import { Carregando, Erro } from '../../shared/estado';
 import { Icone } from '../../shared/icone';
 
@@ -35,6 +35,8 @@ export class AdminServicoForm implements OnInit {
   protected readonly editando = computed(() => !!this.id());
 
   protected readonly categorias = signal<Categoria[]>([]);
+  protected readonly orgaos = signal<Orgao[]>([]);
+  protected readonly esferas = ESFERA_ROTULO;
   protected readonly todosDocumentos = signal<Documento[]>([]);
   protected readonly servico = signal<ServicoDetalhe | null>(null);
   protected readonly carregando = signal(true);
@@ -54,12 +56,12 @@ export class AdminServicoForm implements OnInit {
   // Formulário com as mesmas validações da API
   protected readonly form = this.fb.nonNullable.group({
     categoriaId: [0, [Validators.required, Validators.min(1)]],
-    nome: ['', [Validators.required, Validators.maxLength(100)]],
-    descricao: ['', [Validators.required, Validators.maxLength(500)]],
-    publicoAlvo: ['', [Validators.maxLength(255)]],
-    orgaoResponsavel: ['', [Validators.required, Validators.maxLength(120)]],
+    nome: ['', [Validators.required, Validators.maxLength(120)]],
+    descricao: ['', [Validators.required, Validators.maxLength(1000)]],
+    publicoAlvo: ['', [Validators.maxLength(300)]],
+    orgaoId: [0, [Validators.required, Validators.min(1)]],
     canal: ['DIGITAL' as Canal, [Validators.required]],
-    urlFonte: ['https://', [Validators.required, Validators.maxLength(255), Validators.pattern(/^https:\/\/[^\s.]+\.[^\s]+$/i)]],
+    urlFonte: ['https://', [Validators.required, Validators.maxLength(500), Validators.pattern(/^https:\/\/[^\s.]+\.[^\s]+$/i)]],
     dataVerificacao: [HOJE, [Validators.required]],
     palavrasChave: ['', [Validators.maxLength(400)]],
   });
@@ -69,6 +71,7 @@ export class AdminServicoForm implements OnInit {
   protected readonly novaEtapaTexto = signal('');
   protected readonly novoDocumentoId = signal(0);
   protected readonly novaObservacao = signal('');
+  protected readonly novoObrigatorio = signal(true);
 
   ngOnInit(): void {
     this.api.listarCategorias().subscribe({
@@ -83,6 +86,10 @@ export class AdminServicoForm implements OnInit {
       error: (e) => this.falharCarga(e),
     });
     this.api.listarDocumentos().subscribe({ next: (d) => this.todosDocumentos.set(d), error: () => undefined });
+    this.api.listarOrgaos().subscribe({
+      next: (o) => this.orgaos.set([...o].sort((a, b) => a.nome.localeCompare(b.nome))),
+      error: () => undefined,
+    });
   }
 
   protected carregarServico(): void {
@@ -96,7 +103,7 @@ export class AdminServicoForm implements OnInit {
           nome: s.nome,
           descricao: s.descricao,
           publicoAlvo: s.publicoAlvo ?? '',
-          orgaoResponsavel: s.orgaoResponsavel,
+          orgaoId: s.orgao?.id ?? 0,
           canal: s.canal,
           urlFonte: s.urlFonte,
           dataVerificacao: s.dataVerificacao,
@@ -130,6 +137,7 @@ export class AdminServicoForm implements OnInit {
     const body: ServicoRequest = {
       ...v,
       categoriaId: Number(v.categoriaId),
+      orgaoId: Number(v.orgaoId),
       publicoAlvo: v.publicoAlvo || null,
       palavrasChave: v.palavrasChave || null,
     };
@@ -202,8 +210,14 @@ export class AdminServicoForm implements OnInit {
   protected vincularDocumento(): void {
     const documentoId = Number(this.novoDocumentoId());
     if (!documentoId) return this.mostrar('Escolha um documento.', true);
-    this.api.vincularDocumento(this.sid(), { documentoId, observacao: this.novaObservacao().trim() || null }).subscribe({
-      next: () => { this.novoDocumentoId.set(0); this.novaObservacao.set(''); this.recarregar('Documento vinculado.'); },
+    const vinculo = { documentoId, observacao: this.novaObservacao().trim() || null, obrigatorio: this.novoObrigatorio() };
+    this.api.vincularDocumento(this.sid(), vinculo).subscribe({
+      next: () => {
+        this.novoDocumentoId.set(0);
+        this.novaObservacao.set('');
+        this.novoObrigatorio.set(true);
+        this.recarregar('Documento vinculado.');
+      },
       error: (e) => this.mostrar(mensagemDeErro(e), true),
     });
   }

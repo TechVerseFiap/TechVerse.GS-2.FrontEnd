@@ -1,0 +1,44 @@
+.descricao { font-size: 1.125rem; max-width: 62ch; }
+.busca { max-width: 640px; }
+.campo-busca { position: relative; }
+.campo-busca app-icone { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--texto-suave); }
+.campo-busca .entrada { padding-left: 44px; }
+
+.resultados {
+  list-style: none; margin: 0; padding: 0;
+  border: 1px solid var(--borda); border-radius: var(--raio);
+  max-height: 320px; overflow-y: auto;
+}
+.resultados li + li { border-top: 1px solid var(--borda); }
+.resultado {
+  width: 100%; min-height: 48px; padding: 8px 14px;
+  display: flex; align-items: center; gap: 10px;
+  background: var(--superficie); color: var(--texto);
+  border: none; font: inherit; text-align: left; cursor: pointer;
+}
+.resultado:hover, .resultado:focus-visible { background: var(--azul-claro); }
+.resultado app-icone { color: var(--azul); }
+
+.indicadores {
+  list-style: none; margin: 0; padding: 0;
+  display: grid; gap: 16px;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr));
+}
+.indicador { display: flex; flex-direction: column; gap: 10px; }
+.indicador-icone {
+  width: 44px; height: 44px; border-radius: 12px; flex-shrink: 0;
+  background: var(--azul-claro); color: var(--azul);
+  display: inline-flex; align-items: center; justify-content: center;
+}
+.indicador-nome { font-size: 1.0625rem; }
+.indicador-valor { font-size: 2rem; font-weight: 800; color: var(--azul-escuro); line-height: 1.15; overflow-wrap: anywhere; }
+.indicador-unidade { font-size: 1rem; font-weight: 600; color: var(--texto-suave); }
+.fonte { display: flex; gap: 6px; align-items: flex-start; }
+.fonte app-icone { margin-top: 2px; color: var(--verde); }
+.convite { align-self: flex-start; margin-top: auto; display: inline-flex; align-items: center; gap: 4px; }
+.vazio { align-items: center; text-align: center; color: var(--texto-suave); padding-block: 32px; }
+.vazio app-icone { color: var(--azul); }
+
+:host-context(.alto-contraste) .indicador-valor { color: #fff; }
+:host-context(.alto-contraste) .indicador-icone,
+:host-context(.alto-contraste) .resultado { background: #000; color: #fff; }

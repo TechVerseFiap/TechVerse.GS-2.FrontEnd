@@ -3,7 +3,7 @@ import { DatePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, effect, inject, input, signal, untracked } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { Api, mensagemDeErro } from '../../core/api';
-import { CANAL_ROTULO, ServicoDetalhe } from '../../core/models';
+import { CANAL_ROTULO, ESFERA_ROTULO, ServicoDetalhe } from '../../core/models';
 import { Salvos } from '../../core/salvos';
 import { AvisoOficial, Carregando, Erro } from '../../shared/estado';
 import { Icone } from '../../shared/icone';
@@ -26,6 +26,7 @@ export class ServicoPagina {
   protected readonly erro = signal('');
   protected readonly separados = signal<Set<number>>(new Set());
   protected readonly canal = CANAL_ROTULO;
+  protected readonly esfera = ESFERA_ROTULO;
 
   protected readonly progresso = computed(() => {
     const total = this.servico()?.documentos.length ?? 0;
@@ -67,6 +68,11 @@ export class ServicoPagina {
 
   protected alternarSalvo(s: ServicoDetalhe): void {
     this.salvos.alternar({ id: s.id, nome: s.nome, categoria: s.categoria.nome });
+  }
+
+  // Canais presenciais com o local de atendimento informado no cadastro
+  protected presenciais(s: ServicoDetalhe) {
+    return (s.canais ?? []).filter((c) => c.tipo === 'PRESENCIAL' && c.endereco);
   }
 
   protected dominio(url: string): string {

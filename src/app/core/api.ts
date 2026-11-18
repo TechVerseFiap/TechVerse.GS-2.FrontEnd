@@ -11,6 +11,10 @@ import {
   ErroApi,
   Etapa,
   Indicadores,
+  Municipio,
+  Orgao,
+  OrgaoRequest,
+  Panorama,
   Requisito,
   RespostaAssistente,
   ServicoDetalhe,
@@ -40,6 +44,28 @@ export class Api {
   }
   excluirCategoria(id: number): Observable<void> {
     return this.http.delete<void>(`${this.base}/categorias/${id}`);
+  }
+
+  // Órgãos responsáveis
+  listarOrgaos(): Observable<Orgao[]> {
+    return this.http.get<Orgao[]>(`${this.base}/orgaos`);
+  }
+  criarOrgao(body: OrgaoRequest): Observable<Orgao> {
+    return this.http.post<Orgao>(`${this.base}/orgaos`, body);
+  }
+  atualizarOrgao(id: number, body: OrgaoRequest): Observable<Orgao> {
+    return this.http.put<Orgao>(`${this.base}/orgaos/${id}`, body);
+  }
+  excluirOrgao(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.base}/orgaos/${id}`);
+  }
+
+  // Panorama do município
+  buscarMunicipios(busca: string): Observable<Municipio[]> {
+    return this.http.get<Municipio[]>(`${this.base}/municipios`, { params: new HttpParams().set('busca', busca) });
+  }
+  panorama(codigoIbge: number): Observable<Panorama> {
+    return this.http.get<Panorama>(`${this.base}/municipios/${codigoIbge}/panorama`);
   }
 
   // Serviços

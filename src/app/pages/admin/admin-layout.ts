@@ -61,6 +61,7 @@ import { Icone } from '../../shared/icone';
           <ul>
             <li><a routerLink="servicos" routerLinkActive="ativo" ariaCurrentWhenActive="page"><app-icone nome="documentos" [tamanho]="20" />Serviços</a></li>
             <li><a routerLink="categorias" routerLinkActive="ativo" ariaCurrentWhenActive="page"><app-icone nome="categoria" [tamanho]="20" />Categorias</a></li>
+            <li><a routerLink="orgaos" routerLinkActive="ativo" ariaCurrentWhenActive="page"><app-icone nome="predio" [tamanho]="20" />Órgãos</a></li>
             <li><a routerLink="documentos" routerLinkActive="ativo" ariaCurrentWhenActive="page"><app-icone nome="check" [tamanho]="20" />Documentos</a></li>
             <li><a routerLink="indicadores" routerLinkActive="ativo" ariaCurrentWhenActive="page"><app-icone nome="grafico" [tamanho]="20" />Indicadores</a></li>
           </ul>

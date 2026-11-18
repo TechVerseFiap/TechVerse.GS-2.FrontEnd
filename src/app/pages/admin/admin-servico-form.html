@@ -42,7 +42,7 @@
       <div class="campo">
         <label for="f-desc">Descrição em linguagem simples *</label>
         <textarea id="f-desc" class="entrada" rows="3" formControlName="descricao" [attr.aria-invalid]="!!erroDe('descricao')" aria-describedby="h-desc e-desc"></textarea>
-        <span id="h-desc" class="campo-ajuda">Frases curtas, sem termos técnicos. Máximo 500 caracteres.</span>
+        <span id="h-desc" class="campo-ajuda">Frases curtas, sem termos técnicos. Máximo 1000 caracteres.</span>
         @if (erroDe('descricao')) { <span id="e-desc" class="campo-erro">{{ erroDe('descricao') }}</span> }
       </div>
 
@@ -54,8 +54,14 @@
         </div>
         <div class="campo">
           <label for="f-orgao">Órgão responsável *</label>
-          <input id="f-orgao" class="entrada" formControlName="orgaoResponsavel" [attr.aria-invalid]="!!erroDe('orgaoResponsavel')" aria-describedby="e-orgao" />
-          @if (erroDe('orgaoResponsavel')) { <span id="e-orgao" class="campo-erro">{{ erroDe('orgaoResponsavel') }}</span> }
+          <select id="f-orgao" class="entrada" formControlName="orgaoId" [attr.aria-invalid]="!!erroDe('orgaoId')" aria-describedby="h-orgao e-orgao">
+            <option [ngValue]="0" disabled>Selecione</option>
+            @for (o of orgaos(); track o.id) {
+              <option [ngValue]="o.id">{{ o.nome }} ({{ o.sigla }} · {{ esferas[o.esfera] }})</option>
+            }
+          </select>
+          <span id="h-orgao" class="campo-ajuda">Não está na lista? Cadastre em <a routerLink="/admin/orgaos">Órgãos</a>.</span>
+          @if (erroDe('orgaoId')) { <span id="e-orgao" class="campo-erro">{{ erroDe('orgaoId') }}</span> }
         </div>
       </div>
 
@@ -155,7 +161,7 @@
         <ul class="itens">
           @for (d of s.documentos; track d.documentoId) {
             <li class="item linha-entre">
-              <span><strong>{{ d.nome }}</strong>@if (d.observacao) { <span class="texto-suave"> — {{ d.observacao }}</span> }</span>
+              <span><strong>{{ d.nome }}</strong>@if (d.obrigatorio === false) { &nbsp;<span class="chip chip-neutro chip-mini">opcional</span> }@if (d.observacao) { <span class="texto-suave"> — {{ d.observacao }}</span> }</span>
               <button type="button" class="botao-texto" style="color: var(--vermelho)" (click)="desvincular(d.documentoId)">Desvincular<span class="sr-only"> {{ d.nome }}</span></button>
             </li>
           } @empty {
@@ -172,6 +178,10 @@
           </select>
           <label class="sr-only" for="nova-obs">Observação</label>
           <input id="nova-obs" class="entrada" placeholder="Observação (opcional)" [value]="novaObservacao()" (input)="novaObservacao.set($any($event.target).value)" />
+          <label class="linha" style="gap: 8px; min-height: 44px; font-weight: 400; flex: 0 0 auto">
+            <input type="checkbox" [checked]="novoObrigatorio()" (change)="novoObrigatorio.set($any($event.target).checked)" style="width: 20px; height: 20px; accent-color: var(--azul)" />
+            Obrigatório
+          </label>
           <button type="button" class="botao botao-secundario botao-pequeno" (click)="vincularDocumento()">Vincular</button>
         </div>
         <p class="m-0 texto-pequeno texto-suave">Documento novo? Cadastre antes em <a routerLink="/admin/documentos">Documentos</a>.</p>

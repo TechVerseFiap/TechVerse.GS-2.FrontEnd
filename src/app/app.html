@@ -28,6 +28,7 @@
       <ul class="menu">
         <li><a routerLink="/" routerLinkActive="ativo" [routerLinkActiveOptions]="{ exact: true }" ariaCurrentWhenActive="page">Início</a></li>
         <li><a routerLink="/assistente" routerLinkActive="ativo" ariaCurrentWhenActive="page">Assistente</a></li>
+        <li><a routerLink="/panorama" routerLinkActive="ativo" ariaCurrentWhenActive="page">Sua cidade</a></li>
         <li>
           <a routerLink="/salvos" routerLinkActive="ativo" ariaCurrentWhenActive="page">
             Salvos
@@ -60,6 +61,9 @@
   </a>
   <a routerLink="/assistente" routerLinkActive="ativo" ariaCurrentWhenActive="page">
     <app-icone nome="conversa" [tamanho]="22" /><span>Assistente</span>
+  </a>
+  <a routerLink="/panorama" routerLinkActive="ativo" ariaCurrentWhenActive="page">
+    <app-icone nome="cidade" [tamanho]="22" /><span>Cidade</span>
   </a>
   <a routerLink="/salvos" routerLinkActive="ativo" ariaCurrentWhenActive="page">
     <span class="icone-com-contador">
