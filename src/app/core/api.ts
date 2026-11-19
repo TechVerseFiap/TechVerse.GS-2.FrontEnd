@@ -17,7 +17,6 @@ import {
   Panorama,
   Requisito,
   RespostaAssistente,
-  ResultadoSincronizacao,
   ServicoDetalhe,
   ServicoRequest,
   ServicoResumo,
@@ -70,12 +69,12 @@ export class Api {
     return this.http.get<Panorama>(`${this.base}/municipios/${codigoIbge}/panorama`);
   }
 
-  // Base dos Dados: a API roda o SQL no BigQuery e grava os valores mais recentes no Oracle
+  // Sincronização: a API lê o catálogo do gov.br e a Base dos Dados em segundo plano; o status mostra o progresso
   statusSincronizacao(): Observable<StatusSincronizacao> {
     return this.http.get<StatusSincronizacao>(`${this.base}/sincronizacao`);
   }
-  sincronizarBaseDosDados(): Observable<ResultadoSincronizacao> {
-    return this.http.post<ResultadoSincronizacao>(`${this.base}/sincronizacao`, null);
+  iniciarSincronizacao(): Observable<StatusSincronizacao> {
+    return this.http.post<StatusSincronizacao>(`${this.base}/sincronizacao`, null);
   }
 
   // Serviços

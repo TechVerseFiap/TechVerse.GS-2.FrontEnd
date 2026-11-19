@@ -181,7 +181,18 @@ export interface Panorama {
   aviso: string;
 }
 
-// Sincronização com a Base dos Dados (SQL no BigQuery -> Oracle)
+// Sincronização: catálogo do gov.br (páginas de serviços) e indicadores da Base dos Dados (SQL no BigQuery) -> Oracle
+export interface ResultadoCatalogo {
+  inicio: string;
+  fim: string;
+  encontrados: number;
+  novos: number;
+  atualizados: number;
+  pulados: number;
+  erros: number;
+  porCategoria: Record<string, number>;
+}
+
 export interface IndicadorSincronizado {
   codigo: string;
   periodo: string;
@@ -202,7 +213,11 @@ export interface ResultadoSincronizacao {
 export interface StatusSincronizacao {
   configurada: boolean;
   emAndamento: boolean;
+  etapaAtual: string | null;
+  progresso: string | null;
   uf: string;
+  ultimoCatalogo: ResultadoCatalogo | null;
+  erroCatalogo: string | null;
   ultimaSincronizacao: ResultadoSincronizacao | null;
   ultimoErro: string | null;
 }
