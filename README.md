@@ -41,7 +41,7 @@ Interface web do **Cidadão Fácil**: o cidadão descreve o que precisa com as p
 | `/admin/categorias` | CRUD de categorias | `GET`, `POST`, `PUT`, `DELETE /api/categorias` |
 | `/admin/orgaos` | CRUD de órgãos responsáveis (sigla e esfera) | `GET`, `POST`, `PUT`, `DELETE /api/orgaos` |
 | `/admin/documentos` | CRUD de documentos | `GET`, `POST`, `PUT`, `DELETE /api/documentos` |
-| `/admin/indicadores` | Indicador de impacto | `GET /api/assistente/indicadores` |
+| `/admin/indicadores` | Indicador de impacto e atualização do panorama pela Base dos Dados | `GET /api/assistente/indicadores`, `GET`, `POST /api/sincronizacao` |
 
 ## Diretrizes de UX e acessibilidade aplicadas
 
@@ -49,7 +49,7 @@ Interface web do **Cidadão Fácil**: o cidadão descreve o que precisa com as p
 - **Transparência**: toda orientação mostra a fonte oficial e a data de verificação; dados antigos aparecem como “Informação em revisão”.
 - **Honestidade**: quando não encontra nada, o assistente diz isso e oferece saídas (reescrever ou escolher um assunto).
 - **Acessibilidade**: fonte *Atkinson Hyperlegible* (criada para baixa visão), contraste ≥ 4.5:1, modo **alto contraste**, **A+ / A-**, link “Pular para o conteúdo”, foco visível, alvos de toque ≥ 44 px, rótulos em todos os campos, mensagens de erro ligadas aos campos (`aria-describedby`), respostas do assistente anunciadas a leitores de tela (`aria-live`), respeito a “reduzir movimento”.
-- **Mobile first**: todas as telas funcionam em 360 px. No celular, o topo fica compacto (aviso em uma linha e opções de acessibilidade no botão **Aa**), a navegação vai para uma barra fixa embaixo, como em aplicativos, e as tabelas do painel viram cartões.
+- **Mobile first de verdade**: o CSS base é o do celular e as telas maiores são acréscimos com `@media (min-width: 48rem)` (tablet) e `@media (min-width: 64rem)` (computador). As grades usam `minmax(min(100%, ...), 1fr)` para não estourar em telas de 320 px. No celular, o topo fica compacto (aviso em uma linha e opções de acessibilidade no botão **Aa**), a navegação fica numa barra fixa embaixo, como em aplicativos, o campo do assistente fica logo acima dela e as tabelas do painel viram cartões. Do tablet em diante aparecem o menu no topo, o menu lateral do painel e, no computador, a coluna lateral fixa no detalhe do serviço.
 - **Dados públicos com contexto**: o panorama mostra só números agregados por município, sempre com fonte, período e o aviso de que não indicam direito a benefício.
 - **Privacidade**: o cidadão não faz login nem informa CPF ou documentos. “Salvos” fica só no navegador. Só o painel da equipe pede login.
 - **Identidade**: paleta inspirada no padrão visual de serviços públicos digitais (azul institucional + amarelo), **sem usar marcas oficiais** e com aviso fixo de que não é um site do governo.
@@ -82,8 +82,7 @@ src/app/
 │   ├── autenticacao.ts        # login simulado do painel + guarda de rota
 │   ├── models.ts              # tipos = DTOs da API
 │   ├── preferencias.ts        # fonte e alto contraste
-│   ├── salvos.ts              # serviços salvos (localStorage)
-│   └── mock/                  # modo demonstração (API simulada no navegador)
+│   └── salvos.ts              # serviços salvos (localStorage)
 ├── shared/                    # ícones, carregando, erro, aviso oficial
 └── pages/                     # uma pasta por tela (rotas com lazy loading)
 ```
@@ -93,35 +92,37 @@ Angular 22 · componentes standalone · signals · controle de fluxo `@if/@for` 
 ## Como executar
 
 ### Online (sem instalar nada)
-Acesse https://cidadao-facil-techverse.vercel.app. O site já está ligado à API publicada no Render, com os dados no Oracle da FIAP.
+Acesse https://cidadao-facil-techverse.vercel.app. O site chama a API publicada no Render, que lê o Oracle da FIAP e busca os indicadores do panorama na [Base dos Dados](https://basedosdados.org). Não existe modo de demonstração: tudo o que aparece vem da API.
 
 Roteiro sugerido:
 1. Na tela inicial, escreva *“estou desempregado e quero um curso gratuito”*.
 2. Abra um dos serviços recomendados e marque os documentos no checklist.
-3. Em **Painel**, entre com um RM da tabela acima e a senha `techverse2026`; veja a lista de serviços, edite um e confira os **Indicadores**.
-4. Teste **A+ / A-** e **Alto contraste** na barra do topo (no celular, pelo botão **Aa**).
+3. Em **Sua cidade**, busque um município de SP e veja os indicadores com fonte e período.
+4. Em **Painel**, entre com um RM da tabela acima e a senha `techverse2026`; veja a lista de serviços, edite um e, em **Indicadores**, clique em **Atualizar com a Base dos Dados**.
+5. Teste **A+ / A-** e **Alto contraste** na barra do topo (no celular, pelo botão **Aa**).
 
 ### Localmente
-Requisitos: **Node.js 22+** e npm.
+Requisitos: **Node.js 22.22.3+** (ou 24.15+) e npm. O front precisa da API Java rodando.
+
+1. Suba a API (repositório [TechVerse.GS-2.BackEnd](https://github.com/TechVerseFiap/TechVerse.GS-2.BackEnd)) em `http://localhost:8080`, por exemplo com o banco H2: `mvn spring-boot:run -Dspring-boot.run.profiles=dev`.
+2. No front:
 
 ```bash
 npm install
+npm start
 ```
 
 | Comando | Resultado |
 |---|---|
-| `npm start` | `http://localhost:4200` em **modo demonstração**: dados de exemplo no navegador, sem a API |
+| `npm start` | `http://localhost:4200` ligado à **API local** (`http://localhost:8080/api`) |
 | `npx ng serve --configuration production` | `http://localhost:4200` ligado à **API publicada no Render** |
-
-Para usar a API rodando no seu computador (`http://localhost:8080`), troque `useMock` para `false` em `src/environments/environment.development.ts` e rode `npm start`.
 
 ### Ambientes
 
 | Arquivo | Usado em | API |
 |---|---|---|
-| `environment.development.ts` | `npm start` | modo demonstração (ou `localhost:8080` com `useMock: false`) |
-| `environment.ts` | `npm run build` (produção) | `https://cidadao-facil-api.onrender.com/api` |
-| `environment.demo.ts` | `npx ng build --configuration demo` | modo demonstração, sem API |
+| `environment.development.ts` | `npm start` | `http://localhost:8080/api` |
+| `environment.ts` | `npm run build` (produção, Vercel) | `https://cidadao-facil-api.onrender.com/api` |
 
 O build gera os arquivos em `dist/cidadao-facil-web/browser`.
 
