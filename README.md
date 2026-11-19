@@ -8,12 +8,13 @@ Interface web do **Cidadão Fácil**: o cidadão descreve o que precisa com as p
 
 | | Link |
 |---|---|
+| **Site publicado (front-end, Render)** | https://cidadao-facil-web.onrender.com |
 | **Site publicado (front-end, Vercel)** | https://cidadao-facil-techverse.vercel.app |
-| **API publicada (Java / Spring Boot)** | https://cidadao-facil-api.onrender.com |
-| **Swagger da API** | https://cidadao-facil-api.onrender.com/swagger-ui.html |
+| **API publicada (Java / Spring Boot)** | https://cidadao-facil-api-6hqm.onrender.com |
+| **Swagger da API** | https://cidadao-facil-api-6hqm.onrender.com/swagger-ui.html |
 | **Repositório da API** | https://github.com/TechVerseFiap/TechVerse.GS-2.BackEnd |
 
-> O front fica no **Vercel** e a API no **Render**. No plano gratuito do Render, se a API estiver parada, a primeira busca pode levar cerca de 1 minuto. Para "acordar" antes de usar, abra https://cidadao-facil-api.onrender.com/api/status e espere aparecer `"status":"online"`.
+> O front está publicado no **Render** e no **Vercel** (mesmo código, mesma API) e a API fica no **Render**. No plano gratuito do Render, se a API estiver parada, a primeira busca pode levar cerca de 1 minuto. Para "acordar" antes de usar, abra https://cidadao-facil-api-6hqm.onrender.com/api/status e espere aparecer `"status":"online"`.
 
 ## Ficha da CitizenTech
 
@@ -92,7 +93,7 @@ Angular 22 · componentes standalone · signals · controle de fluxo `@if/@for` 
 ## Como executar
 
 ### Online (sem instalar nada)
-Acesse https://cidadao-facil-techverse.vercel.app. O site chama a API publicada no Render, que lê o Oracle da FIAP e busca os indicadores do panorama na [Base dos Dados](https://basedosdados.org). Não existe modo de demonstração: tudo o que aparece vem da API.
+Acesse https://cidadao-facil-web.onrender.com (ou https://cidadao-facil-techverse.vercel.app). O site chama a API publicada no Render, que lê o Oracle da FIAP e busca os indicadores do panorama na [Base dos Dados](https://basedosdados.org). Não existe modo de demonstração: tudo o que aparece vem da API.
 
 Roteiro sugerido:
 1. Na tela inicial, escreva *“estou desempregado e quero um curso gratuito”*.
@@ -122,9 +123,20 @@ npm start
 | Arquivo | Usado em | API |
 |---|---|---|
 | `environment.development.ts` | `npm start` | `http://localhost:8080/api` |
-| `environment.ts` | `npm run build` (produção, Vercel) | `https://cidadao-facil-api.onrender.com/api` |
+| `environment.ts` | `npm run build` (produção, Render e Vercel) | `https://cidadao-facil-api-6hqm.onrender.com/api` |
 
 O build gera os arquivos em `dist/cidadao-facil-web/browser`.
+
+### Deploy no Render (site estático)
+Publicado em https://cidadao-facil-web.onrender.com (plano gratuito), com o mesmo `render.yaml` da raiz:
+
+| Campo | Valor |
+|---|---|
+| Tipo | Static Site |
+| Build Command | `npm ci && npm run build` |
+| Publish Directory | `dist/cidadao-facil-web/browser` |
+| Variável `NODE_VERSION` | `24` (o Angular 22 exige Node 22.22.3+) |
+| Rewrite | `/*` → `/index.html`, para as rotas do Angular funcionarem ao recarregar a página |
 
 ### Deploy no Vercel
 O site está publicado em https://cidadao-facil-techverse.vercel.app (plano Hobby, gratuito). A configuração fica no `vercel.json` da raiz:
@@ -137,7 +149,7 @@ O site está publicado em https://cidadao-facil-techverse.vercel.app (plano Hobb
 | Output Directory | `dist/cidadao-facil-web/browser` |
 | Rewrites | `/(.*)` → `/index.html`, para as rotas do Angular funcionarem ao recarregar a página |
 
-Cada commit na branch `main` gera um novo deploy automaticamente. A API continua no Render (https://cidadao-facil-api.onrender.com).
+Cada commit na branch `main` gera um novo deploy automaticamente. A API continua no Render (https://cidadao-facil-api-6hqm.onrender.com).
 
 Para publicar uma cópia: em https://vercel.com, **Add New › Project**, importe este repositório e clique em **Deploy** (os campos acima já vêm do `vercel.json`).
 
