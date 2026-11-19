@@ -75,6 +75,14 @@ export class ServicoPagina {
     return (s.canais ?? []).filter((c) => c.tipo === 'PRESENCIAL' && c.endereco);
   }
 
+  // Primeiro canal digital com link próprio (diferente da página da fonte), se houver
+  protected linkDoPedido(s: ServicoDetalhe): string | null {
+    const digital = (s.canais ?? []).find(
+      (c) => c.tipo === 'DIGITAL' && c.endereco?.startsWith('http') && c.endereco !== s.urlFonte,
+    );
+    return digital?.endereco ?? null;
+  }
+
   protected dominio(url: string): string {
     try {
       return new URL(url).hostname;

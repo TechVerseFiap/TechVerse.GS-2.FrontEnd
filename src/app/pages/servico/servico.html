@@ -109,11 +109,25 @@
         <div class="cartao pilha">
           <h2>Próximo passo</h2>
           <p class="m-0">Continue no canal oficial para fazer o pedido.</p>
-          <a class="botao botao-primario" [href]="s.urlFonte" target="_blank" rel="noopener noreferrer">
-            Ir para o site oficial
-            <app-icone nome="externo" [tamanho]="18" />
-            <span class="sr-only">(abre em nova aba)</span>
-          </a>
+          @if (linkDoPedido(s); as link) {
+            <!-- Link do botão "Iniciar" da página do gov.br: leva direto para onde o pedido é feito -->
+            <a class="botao botao-primario" [href]="link" target="_blank" rel="noopener noreferrer">
+              Fazer o pedido no canal oficial
+              <app-icone nome="externo" [tamanho]="18" />
+              <span class="sr-only">(abre em nova aba)</span>
+            </a>
+            <a class="botao botao-secundario" [href]="s.urlFonte" target="_blank" rel="noopener noreferrer">
+              Ver o serviço no gov.br
+              <app-icone nome="externo" [tamanho]="18" />
+              <span class="sr-only">(abre em nova aba)</span>
+            </a>
+          } @else {
+            <a class="botao botao-primario" [href]="s.urlFonte" target="_blank" rel="noopener noreferrer">
+              Ir para o site oficial
+              <app-icone nome="externo" [tamanho]="18" />
+              <span class="sr-only">(abre em nova aba)</span>
+            </a>
+          }
           @for (c of presenciais(s); track $index) {
             <p class="m-0 presencial">
               <app-icone nome="local" [tamanho]="18" />
