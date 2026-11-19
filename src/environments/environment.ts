@@ -1,5 +1,5 @@
 // Produção (npm run build / Vercel): API Java publicada no Render
 export const environment = {
   production: true,
-  apiUrl: 'https://cidadao-facil-api.onrender.com/api',
+  apiUrl: 'https://cidadao-facil-api-6hqm.onrender.com/api',
 };

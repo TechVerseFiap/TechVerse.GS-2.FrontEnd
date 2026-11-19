@@ -4,6 +4,10 @@ services:
     runtime: static
     buildCommand: npm ci && npm run build
     staticPublishPath: dist/cidadao-facil-web/browser
+    envVars:
+      # Angular 22 exige Node 22.22.3+
+      - key: NODE_VERSION
+        value: "24"
     routes:
       - type: rewrite
         source: /*
