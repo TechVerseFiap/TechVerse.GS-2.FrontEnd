@@ -34,7 +34,7 @@ export interface Fonte {
   id: number;
   titulo: string;
   url: string;
-  tipo: 'OFICIAL' | 'APOIO';
+  tipo: 'OFICIAL' | 'SIMULADA';
   dataConsulta: string;
 }
 
