@@ -87,23 +87,6 @@
                   "with": "src/environments/environment.development.ts"
                 }
               ]
-            },
-            "demo": {
-              "fileReplacements": [
-                {
-                  "replace": "src/environments/environment.ts",
-                  "with": "src/environments/environment.demo.ts"
-                }
-              ],
-              "outputHashing": "all",
-              "optimization": {
-                "scripts": true,
-                "styles": {
-                  "minify": true,
-                  "inlineCritical": true
-                },
-                "fonts": false
-              }
             }
           },
           "defaultConfiguration": "production"
@@ -116,9 +99,6 @@
             },
             "development": {
               "buildTarget": "cidadao-facil-web:build:development"
-            },
-            "demo": {
-              "buildTarget": "cidadao-facil-web:build:demo"
             }
           },
           "defaultConfiguration": "development"

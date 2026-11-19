@@ -1,7 +1,6 @@
 // Componente raiz: barra de acessibilidade, cabeçalho, menu e rodapé
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
-import { environment } from '../environments/environment';
 import { Preferencias } from './core/preferencias';
 import { Salvos } from './core/salvos';
 import { Icone } from './shared/icone';
@@ -16,7 +15,6 @@ import { Icone } from './shared/icone';
 export class App {
   protected readonly prefs = inject(Preferencias);
   protected readonly salvos = inject(Salvos);
-  protected readonly modoDemo = environment.useMock;
   // Painel de acessibilidade recolhível no celular
   protected readonly acessAberto = signal(false);
 }

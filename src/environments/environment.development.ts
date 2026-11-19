@@ -1,6 +1,5 @@
-// Desenvolvimento (ng serve): useMock true usa dados de demonstração; false chama a API local
+// Desenvolvimento (npm start): API Java rodando no computador (mvn spring-boot:run)
 export const environment = {
   production: false,
   apiUrl: 'http://localhost:8080/api',
-  useMock: true,
 };
