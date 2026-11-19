@@ -33,7 +33,7 @@ Interface web do **Cidadão Fácil**: o cidadão descreve o que precisa com as p
 | `/` | Início: pergunta livre, exemplos, categorias, destaques | `GET /api/categorias`, `GET /api/servicos` |
 | `/assistente?q=` | Conversa com o assistente e recomendações | `POST /api/assistente/perguntas` |
 | `/categorias/:id` | Serviços de uma categoria, com filtro | `GET /api/categorias/{id}`, `GET /api/servicos?categoria=` |
-| `/servicos/:id` | Detalhe: órgão e esfera, requisitos, checklist de documentos (obrigatórios e “se aplicável”), etapas, atendimento presencial, fonte | `GET /api/servicos/{id}` |
+| `/servicos/:id` | Detalhe: órgão e esfera, requisitos, checklist de documentos (obrigatórios e “se aplicável”), etapas, atendimento presencial, fonte e botão que leva direto ao canal oficial do pedido (o “Iniciar” do gov.br) | `GET /api/servicos/{id}` |
 | `/panorama?cidade=` | Panorama da cidade: busca entre os 645 municípios de SP e mostra população (IBGE), saldo de empregos (CAGED), Bolsa Família (CGU) e unidades do SUS (CNES), com fonte e período | `GET /api/municipios?busca=`, `GET /api/municipios/{codigoIbge}/panorama` |
 | `/salvos` | Serviços salvos neste aparelho | (local, sem servidor) |
 | `/login` | Entrada no painel da equipe (login simulado) | (local, sem servidor) |
@@ -42,7 +42,7 @@ Interface web do **Cidadão Fácil**: o cidadão descreve o que precisa com as p
 | `/admin/categorias` | CRUD de categorias | `GET`, `POST`, `PUT`, `DELETE /api/categorias` |
 | `/admin/orgaos` | CRUD de órgãos responsáveis (sigla e esfera) | `GET`, `POST`, `PUT`, `DELETE /api/orgaos` |
 | `/admin/documentos` | CRUD de documentos | `GET`, `POST`, `PUT`, `DELETE /api/documentos` |
-| `/admin/indicadores` | Indicador de impacto e atualização do panorama pela Base dos Dados | `GET /api/assistente/indicadores`, `GET`, `POST /api/sincronizacao` |
+| `/admin/indicadores` | Indicador de impacto e **sincronização** com o gov.br (catálogo) e a Base dos Dados (panorama), com progresso ao vivo | `GET /api/assistente/indicadores`, `GET`, `POST /api/sincronizacao` |
 
 ## Diretrizes de UX e acessibilidade aplicadas
 
@@ -99,7 +99,7 @@ Roteiro sugerido:
 1. Na tela inicial, escreva *“estou desempregado e quero um curso gratuito”*.
 2. Abra um dos serviços recomendados e marque os documentos no checklist.
 3. Em **Sua cidade**, busque um município de SP e veja os indicadores com fonte e período.
-4. Em **Painel**, entre com um RM da tabela acima e a senha `techverse2026`; veja a lista de serviços, edite um e, em **Indicadores**, clique em **Atualizar com a Base dos Dados**.
+4. Em **Painel**, entre com um RM da tabela acima e a senha `techverse2026`; veja a lista de serviços, edite um e, em **Indicadores**, clique em **Sincronizar agora** para montar o catálogo a partir do gov.br e atualizar o panorama.
 5. Teste **A+ / A-** e **Alto contraste** na barra do topo (no celular, pelo botão **Aa**).
 
 ### Localmente
