@@ -9,38 +9,41 @@ import { Icone } from '../../shared/icone';
   imports: [RouterOutlet, RouterLink, RouterLinkActive, Icone],
   changeDetection: ChangeDetectionStrategy.OnPush,
   styles: `
+    /* Celular: sessão em uma linha e menu como faixa de abas rolável, colada no topo */
     .sessao {
-      display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 16px;
-      margin-top: 20px; padding: 10px 16px; border-radius: var(--raio);
+      display: flex; flex-wrap: nowrap; align-items: center; justify-content: space-between; gap: 8px 16px;
+      margin-top: 12px; padding: 4px 6px 4px 14px; border-radius: var(--raio); font-size: 0.9375rem;
       background: var(--superficie); border: 1px solid var(--borda);
     }
-    .sessao p { display: flex; align-items: center; gap: 8px; }
-    .admin { display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-start; padding-top: 20px; }
-    .admin-menu { flex: 1 1 200px; max-width: 240px; }
-    .admin-menu ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
+    .sessao p { display: flex; align-items: center; gap: 8px; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .aviso-painel { display: none; }
+    .admin { display: flex; flex-direction: column; gap: 16px; padding-top: 12px; }
+    .admin-menu {
+      padding: 6px; border-radius: 999px;
+      position: sticky; top: 0; z-index: 5; overflow-x: auto; scrollbar-width: none;
+    }
+    .admin-menu::-webkit-scrollbar { display: none; }
+    .admin-menu ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: row; gap: 4px; }
     .admin-menu a {
-      display: flex; align-items: center; gap: 10px; min-height: 44px; padding: 0 12px;
-      border-radius: 8px; color: var(--texto); text-decoration: none; font-weight: 700; white-space: nowrap;
+      display: flex; align-items: center; gap: 10px; min-height: 40px; padding: 0 14px;
+      border-radius: 999px; color: var(--texto); text-decoration: none; font-weight: 700; white-space: nowrap;
+      font-size: 0.9375rem;
     }
     .admin-menu a:hover { background: var(--azul-claro); }
     .admin-menu a.ativo { background: var(--azul); color: #fff; }
     :host-context(.alto-contraste) .admin-menu a.ativo { color: #000; }
-    .admin-conteudo { flex: 999 1 560px; min-width: 0; }
+    .admin-conteudo { min-width: 0; }
 
-    /* Celular: menu vira uma faixa de abas rolável, colada no topo */
-    @media (max-width: 720px) {
-      .admin { gap: 16px; padding-top: 12px; }
-      .admin-menu {
-        flex-basis: 100%; max-width: none; padding: 6px; border-radius: 999px;
-        position: sticky; top: 0; z-index: 5; overflow-x: auto; scrollbar-width: none;
-      }
-      .admin-menu::-webkit-scrollbar { display: none; }
-      .admin-menu ul { flex-direction: row; gap: 4px; }
-      .admin-menu a { min-height: 40px; padding: 0 14px; border-radius: 999px; font-size: 0.9375rem; }
-      .admin-conteudo { flex-basis: 100%; }
-      .aviso-painel { display: none; }
-      .sessao { flex-wrap: nowrap; margin-top: 12px; padding: 4px 6px 4px 14px; font-size: 0.9375rem; }
-      .sessao p { min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    /* Tablet e computador: menu lateral fixo à esquerda */
+    @media (min-width: 48rem) {
+      .sessao { flex-wrap: wrap; margin-top: 20px; padding: 10px 16px; font-size: inherit; }
+      .sessao p { white-space: normal; }
+      .aviso-painel { display: flex; }
+      .admin { flex-direction: row; gap: 24px; align-items: flex-start; padding-top: 20px; }
+      .admin-menu { flex: 0 0 220px; position: static; padding: 20px; border-radius: var(--raio); overflow: visible; }
+      .admin-menu ul { flex-direction: column; }
+      .admin-menu a { min-height: 44px; padding: 0 12px; border-radius: 8px; font-size: inherit; }
+      .admin-conteudo { flex: 1 1 0; }
     }
   `,
   template: `

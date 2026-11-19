@@ -31,13 +31,17 @@
   display: inline-flex; align-items: center; justify-content: center;
 }
 .indicador-nome { font-size: 1.0625rem; }
-.indicador-valor { font-size: 2rem; font-weight: 800; color: var(--azul-escuro); line-height: 1.15; overflow-wrap: anywhere; }
+.indicador-valor { font-size: 1.75rem; font-weight: 800; color: var(--azul-escuro); line-height: 1.15; overflow-wrap: anywhere; }
 .indicador-unidade { font-size: 1rem; font-weight: 600; color: var(--texto-suave); }
 .fonte { display: flex; gap: 6px; align-items: flex-start; }
 .fonte app-icone { margin-top: 2px; color: var(--verde); }
 .convite { align-self: flex-start; margin-top: auto; display: inline-flex; align-items: center; gap: 4px; }
 .vazio { align-items: center; text-align: center; color: var(--texto-suave); padding-block: 32px; }
 .vazio app-icone { color: var(--azul); }
+
+@media (min-width: 48rem) {
+  .indicador-valor { font-size: 2rem; }
+}
 
 :host-context(.alto-contraste) .indicador-valor { color: #fff; }
 :host-context(.alto-contraste) .indicador-icone,

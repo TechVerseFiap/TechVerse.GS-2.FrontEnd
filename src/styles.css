@@ -84,14 +84,15 @@ a:hover { color: var(--azul-hover); }
   *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
 }
 
-/* Layout */
-.container { width: 100%; max-width: 1120px; margin-inline: auto; padding-inline: 20px; }
-.secao { padding-block: 32px; }
+/* Layout (mobile first: base para o celular, min-width para telas maiores) */
+.container { width: 100%; max-width: 1120px; margin-inline: auto; padding-inline: 16px; }
+.secao { padding-block: 24px; }
 .pilha { display: flex; flex-direction: column; gap: 16px; }
 .pilha-pequena { display: flex; flex-direction: column; gap: 6px; }
 .linha { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
 .linha-entre { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; }
-.grade { display: grid; gap: 16px; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
+/* min(100%, ...) evita que a coluna fique mais larga que telas muito estreitas (320px) */
+.grade { display: grid; gap: 16px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr)); }
 .m-0 { margin: 0; }
 .texto-suave { color: var(--texto-suave); }
 .texto-pequeno { font-size: 0.9375rem; }
@@ -140,7 +141,7 @@ a:hover { color: var(--azul-hover); }
   background: var(--superficie);
   border: 1px solid var(--borda);
   border-radius: var(--raio);
-  padding: 20px;
+  padding: 16px;
   box-shadow: var(--sombra);
 }
 .cartao-link {
@@ -194,7 +195,7 @@ a:hover { color: var(--azul-hover); }
 textarea.entrada { resize: vertical; }
 .entrada:hover { border-color: var(--azul); }
 .entrada[aria-invalid='true'] { border: 2px solid var(--vermelho); }
-.grade-form { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+.grade-form { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)); }
 
 /* Tabelas */
 .tabela-caixa { overflow-x: auto; border: 1px solid var(--borda); border-radius: var(--raio); background: var(--superficie); }
@@ -202,6 +203,23 @@ textarea.entrada { resize: vertical; }
 .tabela th { text-align: left; background: var(--azul-claro); color: var(--azul-escuro); padding: 12px 16px; }
 .alto-contraste .tabela th { color: #fff; }
 .tabela td { padding: 12px 16px; border-top: 1px solid var(--borda); vertical-align: middle; }
+
+/* Tabelas do painel: no celular cada linha é um cartão; a partir do tablet voltam a ser tabela */
+.tabela-caixa:has(.tabela-responsiva) { border: 0; background: transparent; overflow: visible; }
+.tabela-responsiva { min-width: 0; }
+.tabela-responsiva thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); }
+.tabela-responsiva, .tabela-responsiva tbody, .tabela-responsiva tr, .tabela-responsiva td { display: block; }
+.tabela-responsiva tr {
+  margin-bottom: 12px; padding: 14px 16px; border: 1px solid var(--borda);
+  border-radius: var(--raio); background: var(--superficie); box-shadow: var(--sombra);
+}
+.tabela-responsiva td { border: 0; padding: 3px 0; }
+.tabela-responsiva td:first-child { font-size: 1.0625rem; padding-bottom: 6px; }
+.tabela-responsiva td[data-label]:not(:first-child)::before {
+  content: attr(data-label) ': '; font-weight: 700; color: var(--texto-suave);
+}
+.tabela-responsiva .celula-acoes { margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--borda); }
+.tabela-responsiva .celula-acoes .linha { flex-wrap: wrap !important; }
 
 /* Carregando e migalhas */
 .estado { display: flex; align-items: center; gap: 12px; padding: 24px 0; color: var(--texto-suave); }
@@ -216,21 +234,22 @@ textarea.entrada { resize: vertical; }
 .migalhas ol { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; }
 .migalhas li + li::before { content: '›'; margin-right: 6px; color: var(--texto-suave); }
 
-/* Tabelas do painel viram cartões no celular */
-@media (max-width: 720px) {
-  .tabela-caixa:has(.tabela-responsiva) { border: 0; background: transparent; overflow: visible; }
-  .tabela-responsiva { min-width: 0; }
-  .tabela-responsiva thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); }
-  .tabela-responsiva, .tabela-responsiva tbody, .tabela-responsiva tr, .tabela-responsiva td { display: block; }
-  .tabela-responsiva tr {
-    margin-bottom: 12px; padding: 14px 16px; border: 1px solid var(--borda);
-    border-radius: var(--raio); background: var(--superficie); box-shadow: var(--sombra);
+/* Tablet e computador */
+@media (min-width: 48rem) {
+  .container { padding-inline: 24px; }
+  .secao { padding-block: 32px; }
+  .cartao { padding: 20px; }
+
+  .tabela-caixa:has(.tabela-responsiva) { border: 1px solid var(--borda); background: var(--superficie); overflow-x: auto; }
+  .tabela-responsiva { display: table; min-width: 640px; }
+  .tabela-responsiva thead {
+    display: table-header-group; position: static; width: auto; height: auto; overflow: visible; clip: auto;
   }
-  .tabela-responsiva td { border: 0; padding: 3px 0; }
-  .tabela-responsiva td:first-child { font-size: 1.0625rem; padding-bottom: 6px; }
-  .tabela-responsiva td[data-label]:not(:first-child)::before {
-    content: attr(data-label) ': '; font-weight: 700; color: var(--texto-suave);
-  }
-  .tabela-responsiva .celula-acoes { margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--borda); }
-  .tabela-responsiva .celula-acoes .linha { flex-wrap: wrap !important; }
+  .tabela-responsiva tbody { display: table-row-group; }
+  .tabela-responsiva tr { display: table-row; margin: 0; padding: 0; border: 0; border-radius: 0; box-shadow: none; }
+  .tabela-responsiva td { display: table-cell; padding: 12px 16px; border-top: 1px solid var(--borda); }
+  .tabela-responsiva td:first-child { font-size: inherit; padding-bottom: 12px; }
+  .tabela-responsiva td[data-label]:not(:first-child)::before { content: none; }
+  .tabela-responsiva .celula-acoes { margin: 0; padding-top: 12px; border-top: 1px solid var(--borda); }
+  .tabela-responsiva .celula-acoes .linha { flex-wrap: nowrap !important; }
 }

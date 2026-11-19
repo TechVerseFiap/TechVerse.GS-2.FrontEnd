@@ -1,19 +1,16 @@
+/* Celular: conteúdo e lateral empilhados; a lateral vira coluna fixa ao rolar só em telas grandes */
 .detalhe {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 24px;
-  align-items: flex-start;
-}
-.conteudo { flex: 999 1 520px; min-width: 0; }
-.lateral {
-  flex: 1 1 280px;
   display: flex;
   flex-direction: column;
   gap: 16px;
-  position: sticky;
-  top: 16px;
 }
-.descricao { font-size: 1.125rem; }
+.conteudo { min-width: 0; }
+.lateral {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.descricao { font-size: 1.0625rem; }
 .cartao h2 { margin-bottom: 12px; }
 .lista-marcada { margin: 0; padding-left: 22px; display: flex; flex-direction: column; gap: 6px; }
 .checklist { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
@@ -51,9 +48,15 @@
 }
 .alto-contraste .etapa-numero { color: #000; }
 .etapas li span:last-child { padding-top: 4px; }
-.fonte { display: flex; gap: 6px; align-items: flex-start; }
+.fonte { display: flex; gap: 6px; align-items: flex-start; overflow-wrap: anywhere; }
 .presencial { display: flex; gap: 8px; align-items: flex-start; }
 .presencial app-icone { margin-top: 2px; color: var(--azul); }
-@media (max-width: 860px) {
-  .lateral { position: static; }
+@media (min-width: 48rem) {
+  .descricao { font-size: 1.125rem; }
+}
+
+@media (min-width: 64rem) {
+  .detalhe { flex-direction: row; gap: 24px; align-items: flex-start; }
+  .conteudo { flex: 1 1 0; }
+  .lateral { flex: 0 0 320px; position: sticky; top: 16px; }
 }
