@@ -181,6 +181,32 @@ export interface Panorama {
   aviso: string;
 }
 
+// Sincronização com a Base dos Dados (SQL no BigQuery -> Oracle)
+export interface IndicadorSincronizado {
+  codigo: string;
+  periodo: string;
+  linhasRecebidas: number;
+  novas: number;
+  atualizadas: number;
+  ignoradas: number;
+}
+
+export interface ResultadoSincronizacao {
+  uf: string;
+  inicio: string;
+  fim: string;
+  municipiosNovos: number;
+  indicadores: IndicadorSincronizado[];
+}
+
+export interface StatusSincronizacao {
+  configurada: boolean;
+  emAndamento: boolean;
+  uf: string;
+  ultimaSincronizacao: ResultadoSincronizacao | null;
+  ultimoErro: string | null;
+}
+
 export interface ErroApi {
   timestamp: string;
   status: number;

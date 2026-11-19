@@ -17,9 +17,11 @@ import {
   Panorama,
   Requisito,
   RespostaAssistente,
+  ResultadoSincronizacao,
   ServicoDetalhe,
   ServicoRequest,
   ServicoResumo,
+  StatusSincronizacao,
   VinculoDocumento,
 } from './models';
 
@@ -66,6 +68,14 @@ export class Api {
   }
   panorama(codigoIbge: number): Observable<Panorama> {
     return this.http.get<Panorama>(`${this.base}/municipios/${codigoIbge}/panorama`);
+  }
+
+  // Base dos Dados: a API roda o SQL no BigQuery e grava os valores mais recentes no Oracle
+  statusSincronizacao(): Observable<StatusSincronizacao> {
+    return this.http.get<StatusSincronizacao>(`${this.base}/sincronizacao`);
+  }
+  sincronizarBaseDosDados(): Observable<ResultadoSincronizacao> {
+    return this.http.post<ResultadoSincronizacao>(`${this.base}/sincronizacao`, null);
   }
 
   // Serviços
